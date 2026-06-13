@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elektronika — Zápisky &amp; vzorové příklady</title>
+<meta name="description" content="Studijní zápisky z elektroniky a elektrotechniky pro Internet věcí: kondenzátory, cívky, Ohmův zákon, Kirchhoff, baterie, elektrostatika a víc — včetně vzorových příkladů s řešením.">
+<meta name="theme-color" content="#0f1117">
+<meta property="og:title" content="Elektronika — Zápisky &amp; vzorové příklady">
+<meta property="og:description" content="Interaktivní studijní materiál z elektrotechniky s vzorovými příklady a řešením.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230f1117'/%3E%3Ctext x='50' y='52' font-size='58' text-anchor='middle' dominant-baseline='central'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2336;
+    --border: #2a2f40;
+    --text: #e8ecf4;
+    --muted: #7a8099;
+    --c1: #4fc3f7;
+    --c2: #81c784;
+    --c3: #ffb74d;
+    --c4: #f06292;
+    --c5: #ffd54f;
+    --c6: #ce93d8;
+    --c7: #80deea;
+    --c8: #ef9a9a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem 5rem;
+  }
+  header { text-align: center; margin-bottom: 2.5rem; }
+  header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #4fc3f7, #ce93d8, #ffd54f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  header p { margin-top: 0.6rem; color: var(--muted); font-size: 0.88rem; }
+
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 0.45rem;
+    justify-content: center; margin-bottom: 2.5rem;
+  }
+  .nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.38rem 0.85rem;
+    border-radius: 999px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav button:hover, .nav button.active { color: var(--text); border-color: currentColor; }
+
+  /* Toolbar: search + akce */
+  .toolbar {
+    max-width: 920px; margin: 0 auto 1.6rem;
+    display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
+  }
+  .search {
+    flex: 1; min-width: 200px; position: relative;
+  }
+  .search input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 0.86rem;
+    padding: 0.6rem 0.9rem 0.6rem 2.2rem;
+    border-radius: 10px;
+    transition: border-color 0.2s;
+  }
+  .search input:focus { outline: none; border-color: var(--c1); }
+  .search input::placeholder { color: var(--muted); }
+  .search::before {
+    content: "⌕"; position: absolute; left: 0.8rem; top: 50%;
+    transform: translateY(-50%); color: var(--muted); font-size: 1rem;
+  }
+  .toolbar .act {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+  .toolbar .act:hover { color: var(--text); border-color: var(--muted); }
+  .no-results {
+    max-width: 920px; margin: 0 auto; text-align: center;
+    color: var(--muted); font-size: 0.9rem; padding: 2rem 0; display: none;
+  }
+
+  /* Scroll-to-top */
+  .to-top {
+    position: fixed; bottom: 1.4rem; right: 1.4rem;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.2s;
+    z-index: 50;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: translateY(-2px); border-color: var(--muted); }
+
+  mark {
+    background: rgba(255,213,79,0.28); color: var(--text);
+    border-radius: 3px; padding: 0 1px;
+  }
+
+  .grid {
+    max-width: 920px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 1.4rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.1rem 1.4rem; cursor: pointer;
+    border-bottom: 1px solid transparent; transition: border-color 0.2s;
+  }
+  .card.open .card-header { border-color: var(--border); }
+  .card-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .card-title { flex: 1; }
+  .card-title h2 { font-size: 1rem; font-weight: 600; }
+  .card-title span { font-size: 0.74rem; color: var(--muted); }
+  .chevron { color: var(--muted); transition: transform 0.3s; font-size: 1rem; }
+  .card.open .chevron { transform: rotate(180deg); }
+  .card-body { display: none; padding: 1.5rem; }
+  .card.open .card-body { display: block; }
+
+  /* Sections inside card */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 1.4rem 0 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  .card-body p {
+    line-height: 1.75; color: #c8cedf;
+    font-size: 0.88rem; margin-bottom: 0.75rem;
+  }
+  .card-body p:last-child { margin-bottom: 0; }
+  .card-body ul {
+    list-style: none; margin: 0.5rem 0 0.75rem 0;
+  }
+  .card-body ul li {
+    font-size: 0.88rem; color: #c8cedf;
+    line-height: 1.65; padding: 0.18rem 0 0.18rem 1.2rem;
+    position: relative;
+  }
+  .card-body ul li::before {
+    content: "→";
+    position: absolute; left: 0;
+    color: var(--muted); font-size: 0.78rem;
+  }
+
+  .formula {
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid;
+    border-radius: 0 8px 8px 0;
+    padding: 0.65rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    margin: 0.7rem 0;
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .formula .f-label {
+    font-size: 0.68rem; color: var(--muted);
+    font-family: 'Sora', sans-serif; min-width: 70px;
+  }
+  .formula .f-eq { flex: 1; }
+  .formula .f-desc {
+    font-size: 0.7rem; color: var(--muted);
+    font-family: 'Sora', sans-serif; text-align: right;
+  }
+
+  .rule-box {
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 1rem; margin: 0.7rem 0;
+  }
+  .rule-box h3 { font-size: 0.84rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+  .tip {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 0.65rem 1rem;
+    font-size: 0.81rem; color: var(--muted); margin-top: 0.8rem;
+  }
+  .tip::before { content: "💡 "; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+  .tag {
+    background: rgba(255,255,255,0.06); border-radius: 6px;
+    padding: 0.18rem 0.55rem; font-size: 0.7rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Examples */
+  .example {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 0.7rem 0;
+    overflow: hidden;
+  }
+  .example-q {
+    padding: 0.9rem 1rem;
+    font-size: 0.86rem;
+    color: #d0d6e8;
+    line-height: 1.6;
+  }
+  .example-q strong { font-weight: 600; }
+  .example-toggle {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: none; border-top: 1px solid var(--border);
+    color: var(--muted); font-family: 'Sora', sans-serif;
+    font-size: 0.78rem; padding: 0.55rem 1rem;
+    cursor: pointer; text-align: left;
+    transition: background 0.2s, color 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .example-toggle:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+  .example-toggle .arr { transition: transform 0.25s; }
+  .example-toggle.shown .arr { transform: rotate(90deg); }
+  .example-solution {
+    display: none;
+    padding: 0.9rem 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem; color: #c8cedf; line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.15);
+  }
+  .example-solution .step { margin-bottom: 0.35rem; }
+  .example-solution .result {
+    margin-top: 0.6rem; font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  /* color themes */
+  .t1 .card-icon { background: rgba(79,195,247,0.12); }
+  .t1 .formula { border-color: var(--c1); }
+  .t1 .example-toggle.shown, .t1 .example-result { color: var(--c1); }
+  .t2 .card-icon { background: rgba(129,199,132,0.12); }
+  .t2 .formula { border-color: var(--c2); }
+  .t3 .card-icon { background: rgba(255,183,77,0.12); }
+  .t3 .formula { border-color: var(--c3); }
+  .t4 .card-icon { background: rgba(240,98,146,0.12); }
+  .t4 .formula { border-color: var(--c4); }
+  .t5 .card-icon { background: rgba(255,213,79,0.12); }
+  .t5 .formula { border-color: var(--c5); }
+  .t6 .card-icon { background: rgba(206,147,216,0.12); }
+  .t6 .formula { border-color: var(--c6); }
+  .t7 .card-icon { background: rgba(128,222,234,0.12); }
+  .t7 .formula { border-color: var(--c7); }
+  .t8 .card-icon { background: rgba(239,154,154,0.12); }
+  .t8 .formula { border-color: var(--c8); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Internet věcí — Elektrotechnika</div>
+  <h1>Zápisky & Vzorové příklady</h1>
+  <p>Klikni na téma pro rozbalení · Příklady mají skryté řešení</p>
+</header>
+
+<div class="nav" id="nav"></div>
+
+<div class="toolbar">
+  <div class="search">
+    <input type="search" id="search" placeholder="Hledat téma, vzorec, pojem…" autocomplete="off" aria-label="Hledat">
+  </div>
+  <button class="act" id="expandAll">Rozbalit vše</button>
+  <button class="act" id="collapseAll">Sbalit vše</button>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="no-results" id="noResults">Nic nenalezeno — zkus jiný výraz.</div>
+
+<button class="to-top" id="toTop" aria-label="Nahoru">↑</button>
+
+<script>
+function ex(q, steps, color) {
+  const id = Math.random().toString(36).slice(2);
+  const stepsHtml = steps.map(s => `<div class="step">${s}</div>`).join('');
+  const last = steps[steps.length - 1];
+  return `
+    <div class="example">
+      <div class="example-q">${q}</div>
+      <button class="example-toggle" onclick="toggleEx(this,'sol-${id}')">
+        <span class="arr">▶</span> Zobrazit řešení
+      </button>
+      <div class="example-solution" id="sol-${id}">${stepsHtml}</div>
+    </div>`;
+}
+
+function toggleEx(btn, id) {
+  const sol = document.getElementById(id);
+  const shown = sol.style.display === 'block';
+  sol.style.display = shown ? 'none' : 'block';
+  btn.classList.toggle('shown', !shown);
+  btn.childNodes[1].textContent = shown ? ' Zobrazit řešení' : ' Skrýt řešení';
+}
+
+const topics = [
+  {
+    id: "kondenzator", icon: "⚡", theme: "t1", accentVar: "--c1",
+    title: "Kondenzátory", sub: "Ukládání elektrického náboje",
+    body: `
+<div class="section-label">Co to je</div>
+<p><strong style="color:var(--c1)">Kondenzátor</strong> je elektronická součástka schopná ukládat elektrický náboj — a tím i energii — v elektrickém poli mezi dvěma vodivými deskami (elektrodami) oddělenými izolantem zvaným <em>dielektrikum</em>.</p>
+<p>Při připojení napětí se na jedné desce hromadí kladný náboj, na druhé záporný. Čím větší napětí, tím víc náboje se uloží. Jakmile odpojíš zdroj, náboj zůstane — kondenzátor se chová jako krátkodobá baterie.</p>
+
+<div class="section-label">Kapacita</div>
+<p><strong>Kapacita C</strong> udává, kolik náboje kondenzátor pojme na jeden volt napětí. Jednotka je <strong>farad [F]</strong> — v praxi se používají mikrofarady (µF) nebo nanofarady (nF), protože farad je obrovská hodnota.</p>
+<div class="formula"><span class="f-label">Kapacita:</span><span class="f-eq">C = Q / U</span><span class="f-desc">[F] = [C] / [V]</span></div>
+<div class="formula"><span class="f-label">Energie:</span><span class="f-eq">E = ½ · C · U²</span><span class="f-desc">[J]</span></div>
+<div class="formula"><span class="f-label">Náboj:</span><span class="f-eq">Q = C · U</span><span class="f-desc">[C] = coulomb</span></div>
+
+<div class="section-label">Dielektrikum</div>
+<p>Materiál mezi deskami ovlivňuje kapacitu — různé materiály mají různou <em>permitivitu</em> (ε). Vzduch ε ≈ 1, keramika nebo elektrolyt mají εᵣ desítky až tisíce. Proto elektrolytické kondenzátory mají obrovskou kapacitu při malém objemu.</p>
+<div class="formula"><span class="f-label">Deskový kond.:</span><span class="f-eq">C = ε₀ · εᵣ · A / d</span><span class="f-desc">A = plocha desek, d = mezera</span></div>
+
+<div class="section-label">Zapojení</div>
+<ul>
+  <li><strong>Sériové:</strong> 1/C = 1/C₁ + 1/C₂ — výsledná kapacita je <em>menší</em> než nejmenší článek, napětí se dělí</li>
+  <li><strong>Paralelní:</strong> C = C₁ + C₂ — kapacity se sčítají, napětí je stejné na všech</li>
+</ul>
+
+<div class="section-label">Typy kondenzátorů</div>
+<ul>
+  <li><strong>Elektrolytické</strong> — velká kapacita (µF–mF), polarizované, nesmí se přepólovat</li>
+  <li><strong>Keramické</strong> — malá kapacita (pF–nF), nepolarizované, rychlé, stabilní</li>
+  <li><strong>Fóliové</strong> — audio aplikace, přesné, nízkoztrátové</li>
+  <li><strong>Superkondenzátory (EDLC)</strong> — kapacita v Farádech, používané jako krátkodobá baterie</li>
+</ul>
+
+<div class="section-label">Chování v obvodu</div>
+<p>Kondenzátor <strong>blokuje stejnosměrný proud (DC)</strong> ale <strong>propouští střídavý (AC)</strong>. Čím vyšší frekvence, tím lépe propouští. Reaktance kondenzátoru: X_C = 1 / (2π·f·C). V IoT se kondenzátory používají jako filtry napájení (odstranění šumu), decoupling u mikrokontrolérů, nebo v RC oscilátorech.</p>
+<div class="tip">Při práci s elektrolytickými kondenzátory dávej pozor na polaritu — plus na plus! Přepólovaný elektrolytický kondenzátor může explodovat.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Kondenzátor má kapacitu C = 100 µF. Nabijeme ho na napětí U = 12 V. Jaký náboj je na něm uložen a jaká energie?',
+  [
+    'Zadáno: C = 100 µF = 100 × 10⁻⁶ F,  U = 12 V',
+    'Náboj:  Q = C · U = 100×10⁻⁶ · 12 = 1,2 × 10⁻³ C = 1,2 mC',
+    'Energie: E = ½ · C · U² = 0,5 · 100×10⁻⁶ · 144 = 7,2 × 10⁻³ J = 7,2 mJ',
+    '✅ Výsledek: Q = 1,2 mC,  E = 7,2 mJ',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2:</strong> Kondenzátory C₁ = 10 µF a C₂ = 40 µF jsou zapojeny paralelně. Jaká je výsledná kapacita? A co při sériovém zapojení?',
+  [
+    'Paralelní: C = C₁ + C₂ = 10 + 40 = 50 µF',
+    'Sériové:   1/C = 1/C₁ + 1/C₂ = 1/10 + 1/40 = 4/40 + 1/40 = 5/40',
+    '           C = 40/5 = 8 µF',
+    '✅ Paralelně: 50 µF  |  Sériově: 8 µF',
+  ]
+)}
+<div class="tags"><span class="tag">farad [F]</span><span class="tag">dielektrikum</span><span class="tag">náboj Q</span><span class="tag">decoupling</span><span class="tag">reaktance</span></div>`
+  },
+
+  {
+    id: "civky", icon: "🌀", theme: "t2", accentVar: "--c2",
+    title: "Cívky & Magnetismus", sub: "Induktivita, magnetické pole, Faraday",
+    body: `
+<div class="section-label">Co to je</div>
+<p><strong style="color:var(--c2)">Cívka (induktor)</strong> je vinutý vodič — většinou měděný drát navinutý na jádro (vzduch, ferit, železo). Při průchodu proudu vytváří magnetické pole, a naopak: změna magnetického pole v cívce <em>indukuje</em> elektrické napětí (Faradayův zákon).</p>
+<p><strong>Magnetismus</strong> je projev pohybu elektrických nábojů. Každý magnet má dva póly: severní (N) a jižní (S). Stejné póly se odpuzují, různé přitahují. Magnetické pole si vizualizuj jako siločáry — vychází ze severu, vstupují na jihu.</p>
+
+<div class="section-label">Induktivita</div>
+<p><strong>Induktivita L</strong> vyjadřuje, jak dobře cívka "váže" magnetický tok. Závisí na počtu závitů, průřezu jádra a jeho materiálu. Jednotka je <strong>henry [H]</strong> — v praxi µH nebo mH.</p>
+<div class="formula"><span class="f-label">Indukované U:</span><span class="f-eq">U = −L · (ΔI / Δt)</span><span class="f-desc">Volt [V]</span></div>
+<div class="formula"><span class="f-label">Energie v poli:</span><span class="f-eq">E = ½ · L · I²</span><span class="f-desc">Jouly [J]</span></div>
+<div class="formula"><span class="f-label">Induktivita:</span><span class="f-eq">L = (µ₀ · µᵣ · N² · A) / l</span><span class="f-desc">henry [H]</span></div>
+
+<div class="section-label">Faradayův zákon elektromagnetické indukce</div>
+<p>Pokud se mění magnetický tok Φ procházející cívkou, indukuje se v ní napětí. Čím rychleji se tok mění a čím více závitů, tím větší napětí. Znaménko minus říká (Lenzův zákon), že indukované napětí působí <em>proti příčině</em>, která ho způsobila.</p>
+<div class="formula"><span class="f-label">Faraday:</span><span class="f-eq">U = −N · (ΔΦ / Δt)</span><span class="f-desc">N = počet závitů</span></div>
+
+<div class="section-label">Zapojení cívek</div>
+<ul>
+  <li><strong>Sériové:</strong> L = L₁ + L₂ (induktivity se sčítají, jako odpory)</li>
+  <li><strong>Paralelní:</strong> 1/L = 1/L₁ + 1/L₂</li>
+</ul>
+
+<div class="section-label">Chování v obvodu</div>
+<p>Cívka <strong>propouští DC</strong> (stejnosměrný proud) a <strong>brání AC</strong> (střídavému proudu). Je to opačné chování než kondenzátor. Reaktance cívky: X_L = 2π·f·L. V kombinaci LC vznikají rezonanční obvody (ladění rádia, filtry).</p>
+<p><strong>Elektromagnet</strong> = cívka s feromagnetickým jádrem (železo, ferit). Průchodem proudu vznikne silný magnet — relé, reproduktory, MRI přístroje.</p>
+<p><strong>Transformátor</strong> = dvě cívky na společném jádře. Střídavé napětí na primární cívce indukuje napětí na sekundární. Poměr napětí = poměr počtu závitů.</p>
+<div class="formula"><span class="f-label">Transformátor:</span><span class="f-eq">U₁/U₂ = N₁/N₂</span><span class="f-desc"></span></div>
+<div class="tip">V IoT se cívky vyskytují v DC-DC konvertorech (buck/boost), bezdrátovém nabíjení (Qi standard) a RFID čtečkách.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Cívkou prochází proud, který se změní z 0 A na 4 A za 0,02 s. Cívka má induktivitu L = 0,5 H. Jaké napětí se indukuje?',
+  [
+    'Zadáno: L = 0,5 H,  ΔI = 4 A,  Δt = 0,02 s',
+    'Dosadíme: U = −L · (ΔI/Δt) = −0,5 · (4 / 0,02)',
+    'U = −0,5 · 200 = −100 V',
+    '✅ Výsledek: |U| = 100 V  (znaménko minus = Lenzův zákon)',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2:</strong> Transformátor má primární cívku s N₁ = 500 závitů a sekundární s N₂ = 50 závitů. Na primáru je U₁ = 230 V. Jaké napětí bude na sekundáru?',
+  [
+    'Zadáno: N₁ = 500, N₂ = 50, U₁ = 230 V',
+    'Vzorec: U₁/U₂ = N₁/N₂  →  U₂ = U₁ · (N₂/N₁)',
+    'U₂ = 230 · (50/500) = 230 · 0,1 = 23 V',
+    '✅ Výsledek: U₂ = 23 V  (transformátor snižuje napětí 10×)',
+  ]
+)}
+<div class="tags"><span class="tag">henry [H]</span><span class="tag">indukce</span><span class="tag">Faraday</span><span class="tag">Lenz</span><span class="tag">transformátor</span></div>`
+  },
+
+  {
+    id: "ohm", icon: "⚖️", theme: "t3", accentVar: "--c3",
+    title: "Ohmův zákon", sub: "Napětí, proud, odpor a výkon",
+    body: `
+<div class="section-label">Základní princip</div>
+<p><strong style="color:var(--c3)">Ohmův zákon</strong> (Georg Simon Ohm, 1827) popisuje vztah mezi napětím, proudem a odporem v elektrickém obvodu. Platí pro lineární součástky — to jsou součástky, jejichž odpor nezávisí na napětí (rezistory, vodiče).</p>
+<p><strong>Analogie s vodou:</strong> napětí U = tlak vody, proud I = průtok, odpor R = zúžení trubky. Čím větší tlak nebo menší zúžení, tím větší průtok.</p>
+
+<div class="section-label">Vzorce</div>
+<div class="formula"><span class="f-label">Napětí:</span><span class="f-eq">U = R · I</span><span class="f-desc">Volt [V]</span></div>
+<div class="formula"><span class="f-label">Proud:</span><span class="f-eq">I = U / R</span><span class="f-desc">Ampér [A]</span></div>
+<div class="formula"><span class="f-label">Odpor:</span><span class="f-eq">R = U / I</span><span class="f-desc">Ohm [Ω]</span></div>
+
+<div class="section-label">Výkon a energie</div>
+<p><strong>Elektrický výkon P</strong> udává, kolik energie za sekundu součástka spotřebuje (nebo dodá). Jednotka je Watt [W].</p>
+<div class="formula"><span class="f-label">Výkon:</span><span class="f-eq">P = U · I = I² · R = U² / R</span><span class="f-desc">Watt [W]</span></div>
+<div class="formula"><span class="f-label">Energie:</span><span class="f-eq">E = P · t = U · I · t</span><span class="f-desc">Jouly [J]</span></div>
+
+<div class="section-label">Zapojení rezistorů</div>
+<ul>
+  <li><strong>Sériové:</strong> R = R₁ + R₂ + … — odpory se sčítají, stejný proud prochází všemi, napětí se dělí</li>
+  <li><strong>Paralelní:</strong> 1/R = 1/R₁ + 1/R₂ — výsledný odpor je menší než nejmenší z rezistorů, stejné napětí, proudy se dělí</li>
+  <li><strong>Dělič napětí:</strong> U_výstup = U_vstup · R₂ / (R₁ + R₂) — velmi často v IoT pro čtení analogových senzorů</li>
+</ul>
+
+<div class="section-label">Rezistivita a odpor vodiče</div>
+<p>Odpor vodiče závisí na materiálu, délce a průřezu. Měď má malou rezistivitu — proto se používá pro vodiče.</p>
+<div class="formula"><span class="f-label">Odpor vodiče:</span><span class="f-eq">R = ρ · l / A</span><span class="f-desc">ρ = rezistivita, l = délka, A = průřez</span></div>
+
+<div class="tip">Ohmův zákon neplatí pro nelineární součástky: diody, tranzistory, LED — tam se odpor mění s napětím a proudem.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> K baterii 9 V připojíme rezistor R = 470 Ω. Jaký proud prochází obvodem a jaký výkon rezistor spotřebuje?',
+  [
+    'Zadáno: U = 9 V,  R = 470 Ω',
+    'Proud: I = U / R = 9 / 470 ≈ 0,01915 A ≈ 19,1 mA',
+    'Výkon: P = U · I = 9 · 0,01915 ≈ 0,172 W = 172 mW',
+    '(nebo P = U²/R = 81/470 ≈ 0,172 W)',
+    '✅ I ≈ 19,1 mA,  P ≈ 172 mW',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2:</strong> Máme tři rezistory R₁ = 100 Ω, R₂ = 200 Ω, R₃ = 300 Ω. Jaký je výsledný odpor a) v sérii, b) paralelně?',
+  [
+    'a) Sériové: R = R₁ + R₂ + R₃ = 100 + 200 + 300 = 600 Ω',
+    'b) Paralelní: 1/R = 1/100 + 1/200 + 1/300',
+    '   = 6/600 + 3/600 + 2/600 = 11/600',
+    '   R = 600/11 ≈ 54,5 Ω',
+    '✅ Sériově: 600 Ω  |  Paralelně: ≈ 54,5 Ω',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 3 (dělič napětí):</strong> Napájení 5 V, R₁ = 10 kΩ, R₂ = 10 kΩ. Jaké napětí je na R₂?',
+  [
+    'Zadáno: U = 5 V, R₁ = R₂ = 10 000 Ω',
+    'U₂ = U · R₂ / (R₁ + R₂) = 5 · 10000 / (10000 + 10000)',
+    'U₂ = 5 · 10000 / 20000 = 5 · 0,5 = 2,5 V',
+    '✅ Výsledek: U₂ = 2,5 V  (stejné odpory = napětí přesně na půl)',
+  ]
+)}
+<div class="tags"><span class="tag">volt [V]</span><span class="tag">ampér [A]</span><span class="tag">ohm [Ω]</span><span class="tag">watt [W]</span><span class="tag">dělič napětí</span></div>`
+  },
+
+  {
+    id: "kirchhoff", icon: "🔀", theme: "t4", accentVar: "--c4",
+    title: "Kirchhoffovy zákony", sub: "Analýza složitých obvodů — uzly a smyčky",
+    body: `
+<div class="section-label">Proč Kirchhoff?</div>
+<p><strong style="color:var(--c4)">Kirchhoffovy zákony</strong> (Gustav Robert Kirchhoff, 1845) rozšiřují Ohmův zákon na složité obvody s více zdroji a větvemi, kde Ohmův zákon nestačí. Jsou dvě — pro uzly (proudy) a pro smyčky (napětí).</p>
+
+<div class="section-label">1. zákon — Zákon o uzlech (KCL)</div>
+<div class="rule-box">
+  <h3 style="color:var(--c4)">Kirchhoffův zákon proudový (KCL)</h3>
+  <p>Součet všech proudů <em>vstupujících</em> do uzlu se rovná součtu všech proudů <em>vystupujících</em> z uzlu. Elektrický náboj se nikde nehromadí ani neztrácí — zákon zachování náboje.</p>
+  <div class="formula" style="border-color:var(--c4); margin-top:0.6rem">
+    <span class="f-eq">ΣI_vstup = ΣI_výstup</span>
+  </div>
+</div>
+<p><strong>Příklad:</strong> Do uzlu vstupují proudy I₁ = 3 A a I₂ = 2 A. Vystupuje I₃ = ? → I₃ = I₁ + I₂ = 5 A.</p>
+
+<div class="section-label">2. zákon — Zákon o smyčkách (KVL)</div>
+<div class="rule-box">
+  <h3 style="color:var(--c4)">Kirchhoffův zákon napěťový (KVL)</h3>
+  <p>Součet všech napětí v <em>uzavřené smyčce</em> obvodu je nula. Energie dodaná zdrojem (baterií) se rovná energii spotřebované v odporech.</p>
+  <div class="formula" style="border-color:var(--c4); margin-top:0.6rem">
+    <span class="f-eq">ΣU = 0  (v uzavřené smyčce)</span>
+  </div>
+</div>
+<p>Znaménková konvence: Při procházení smyčky zvoleným směrem — napětí zdroje je kladné, úbytky na odporech záporné (nebo dle dohodnuté konvence).</p>
+
+<div class="section-label">Postup řešení obvodu</div>
+<ul>
+  <li>Označ všechny uzly (body kde se větve stýkají)</li>
+  <li>Zvaž směr proudů v každé větvi (i odhad stačí, záporný výsledek = opačný směr)</li>
+  <li>Napiš KCL rovnice pro uzly (n-1 rovnic pro n uzlů)</li>
+  <li>Napiš KVL rovnice pro smyčky</li>
+  <li>Vyřeš soustavu rovnic</li>
+</ul>
+
+<div class="tip">Zkratka: KCL = Current = uzly | KVL = Voltage = smyčky. "K-C-L jako Proud (Current), K-V-L jako Napětí (Voltage)".</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1 (KCL):</strong> Do uzlu A přitéká I₁ = 5 A a I₂ = 3 A. Z uzlu odtékají I₃ a I₄, přičemž I₄ = 2 A. Urči I₃.',
+  [
+    'KCL: ΣI_vstup = ΣI_výstup',
+    'I₁ + I₂ = I₃ + I₄',
+    '5 + 3 = I₃ + 2',
+    'I₃ = 8 − 2 = 6 A',
+    '✅ Výsledek: I₃ = 6 A',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2 (KVL):</strong> V sérii: baterie U = 12 V, rezistor R₁ = 100 Ω, rezistor R₂ = 200 Ω. Jaký proud prochází a jaký je úbytek napětí na každém rezistoru?',
+  [
+    'KVL smyčka: U − U_R₁ − U_R₂ = 0',
+    'U = I · R₁ + I · R₂ = I · (R₁ + R₂)',
+    'I = U / (R₁ + R₂) = 12 / 300 = 0,04 A = 40 mA',
+    'U_R₁ = I · R₁ = 0,04 · 100 = 4 V',
+    'U_R₂ = I · R₂ = 0,04 · 200 = 8 V',
+    'Ověření: 4 + 8 = 12 V ✓',
+    '✅ I = 40 mA,  U_R₁ = 4 V,  U_R₂ = 8 V',
+  ]
+)}
+<div class="tags"><span class="tag">uzel</span><span class="tag">smyčka</span><span class="tag">KCL</span><span class="tag">KVL</span><span class="tag">soustava rovnic</span></div>`
+  },
+
+  {
+    id: "baterie", icon: "🔌", theme: "t5", accentVar: "--c5",
+    title: "Baterie", sub: "Elektrochemické zdroje energie",
+    body: `
+<div class="section-label">Princip fungování</div>
+<p><strong style="color:var(--c5)">Baterie</strong> přeměňuje chemickou energii na elektrickou pomocí oxidačně-redukční (redox) reakce. Skládá se z elektrod (anody a katody) ponořených v elektrolytu. Na anodě probíhá oxidace (uvolňují se elektrony), na katodě redukce (elektrony přijímány).</p>
+<p>Elektrony putují vnějším obvodem od anody ke katodě — to je elektrický proud. Ionty putují přes elektrolyt uvnitř článku.</p>
+
+<div class="section-label">Primární vs. sekundární</div>
+<ul>
+  <li><strong>Primární</strong> — nelze dobíjet, reakce je nevratná (alkalické AA/AAA ~1,5 V, lithiové knoflíkové ~3 V)</li>
+  <li><strong>Sekundární (akumulátory)</strong> — dobíjitelné, reakce je vratná:
+    <ul style="margin-left:1rem; margin-top:0.3rem">
+      <li>Li-Ion / LiPo — ~3,6–3,7 V, vysoká hustota energie, smartphony, IoT</li>
+      <li>NiMH — ~1,2 V, tužkové akumulátory</li>
+      <li>Olověný — ~2 V/článek, auto baterie (6 článků = 12 V)</li>
+      <li>LiFePO₄ — bezpečnější varianta Li-Ion, e-bikes</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="section-label">Klíčové veličiny</div>
+<div class="formula"><span class="f-label">Napětí:</span><span class="f-eq">U = EMF − I · R_int</span><span class="f-desc">Volt [V]</span></div>
+<div class="formula"><span class="f-label">Kapacita:</span><span class="f-eq">Q = I · t</span><span class="f-desc">Ampérhodiny [Ah]</span></div>
+<div class="formula"><span class="f-label">Energie:</span><span class="f-eq">E = U · Q = U · I · t</span><span class="f-desc">Watthodiny [Wh]</span></div>
+<ul>
+  <li><strong>EMF (elektromotorická síla)</strong> — ideální napětí článku bez zátěže</li>
+  <li><strong>Vnitřní odpor R_int</strong> — reálná baterie má vnitřní odpor; pod zátěží napětí klesá (U_výstup = EMF − I·R_int)</li>
+  <li><strong>C-rating</strong> — maximální vybíjecí/nabíjecí proud. 1C = kapacita za 1 hod. Baterie 2000 mAh s 2C může poskytnout 4 A.</li>
+  <li><strong>SOC (State of Charge)</strong> — aktuální nabití v %</li>
+</ul>
+
+<div class="section-label">Sériové a paralelní zapojení článků</div>
+<ul>
+  <li><strong>Sériové:</strong> napětí se sčítají, kapacita zůstává (3× Li-Ion = 11,1 V)</li>
+  <li><strong>Paralelní:</strong> kapacity se sčítají, napětí zůstává (3× Li-Ion 2000 mAh = 6000 mAh při 3,7 V)</li>
+</ul>
+<div class="tip">Nikdy nemíchej staré a nové baterie v paralelním zapojení — starší baterie se může začít nabíjet z novější a přehřát nebo explodovat.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Baterie má EMF = 9 V a vnitřní odpor R_int = 1 Ω. Připojíme zátěž R = 8 Ω. Jaký proud teče a jaké napětí je na svorkách baterie?',
+  [
+    'Celkový odpor: R_celk = R_int + R = 1 + 8 = 9 Ω',
+    'Proud: I = EMF / R_celk = 9 / 9 = 1 A',
+    'Svorky: U = EMF − I · R_int = 9 − 1·1 = 8 V',
+    '(nebo U = I · R = 1 · 8 = 8 V ✓)',
+    '✅ I = 1 A,  U_svorky = 8 V',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2:</strong> Li-Ion baterie má kapacitu 3000 mAh. Zařízení odebírá průměrně 150 mA. Jak dlouho vydrží?',
+  [
+    'Zadáno: Q = 3000 mAh,  I = 150 mA',
+    't = Q / I = 3000 / 150 = 20 hodin',
+    '✅ Výsledek: baterie vydrží 20 hodin',
+  ]
+)}
+<div class="tags"><span class="tag">EMF</span><span class="tag">Li-Ion</span><span class="tag">kapacita [Ah]</span><span class="tag">vnitřní odpor</span><span class="tag">C-rating</span></div>`
+  },
+
+  {
+    id: "elektrostatika", icon: "✨", theme: "t6", accentVar: "--c6",
+    title: "Elektrostatika", sub: "Náboje, pole a Coulombův zákon",
+    body: `
+<div class="section-label">Základy</div>
+<p><strong style="color:var(--c6)">Elektrostatika</strong> studuje elektrické náboje v klidu a síly mezi nimi. Existují dva druhy elektrického náboje: <strong>kladný (+)</strong> a <strong>záporný (−)</strong>. Jednotka náboje je <strong>coulomb [C]</strong>. Elementární náboj elektronu: e = 1,6 × 10⁻¹⁹ C.</p>
+<p>Základní pravidlo: <em>stejné náboje se odpuzují, různé náboje se přitahují.</em></p>
+
+<div class="section-label">Coulombův zákon</div>
+<p>Popisuje sílu mezi dvěma bodovými náboji. Síla klesá s druhou mocninou vzdálenosti (jako gravitace, ale mnohem silnější).</p>
+<div class="formula"><span class="f-label">Coulomb:</span><span class="f-eq">F = k · |Q₁ · Q₂| / r²</span><span class="f-desc">Newton [N]</span></div>
+<p><strong>Coulombova konstanta:</strong> k = 1/(4πε₀) ≈ 9 × 10⁹ N·m²/C²</p>
+<p><strong>Permitivita vakua:</strong> ε₀ ≈ 8,85 × 10⁻¹² F/m</p>
+
+<div class="section-label">Elektrické pole</div>
+<p>Elektrické pole E je prostor, ve kterém náboj pociťuje sílu. Vizualizuje se pomocí <em>siločar</em> — vychází z kladných nábojů, vstupují do záporných. Čím hustší siločáry, tím silnější pole.</p>
+<div class="formula"><span class="f-label">Intenzita pole:</span><span class="f-eq">E = F / q = k · Q / r²</span><span class="f-desc">V/m nebo N/C</span></div>
+<div class="formula"><span class="f-label">Homogenní pole:</span><span class="f-eq">E = U / d</span><span class="f-desc">mezi rovnob. deskami</span></div>
+
+<div class="section-label">Elektrický potenciál a napětí</div>
+<p><strong>Elektrický potenciál φ</strong> je "výška" v elektrickém poli — energie, kterou má jednotkový náboj v daném místě. Napětí U je rozdíl potenciálů mezi dvěma body: U = φ₁ − φ₂.</p>
+<div class="formula"><span class="f-label">Potenciál:</span><span class="f-eq">φ = k · Q / r</span><span class="f-desc">Volt [V]</span></div>
+
+<div class="section-label">Vodiče a izolanty v poli</div>
+<ul>
+  <li><strong>Vodič</strong> v elektrickém poli — náboje se přerozdělí na povrchu, uvnitř je pole nulové (Faradayova klec)</li>
+  <li><strong>Izolant (dielektrikum)</strong> — náboje se nemohou volně pohybovat, ale molekuly se polarizují</li>
+</ul>
+<p><strong>ESD (Electrostatic Discharge)</strong> — výboj statické elektřiny může zničit citlivé součástky. Lidské tělo může nést náboj tisíců voltů — jemné MOSFET tranzistory a mikrochipy se snadno poškodí.</p>
+<div class="tip">Při práci s elektronikou vždy používej antistatický pásek na zápěstí a pracuj na antistatické podložce — jinak riskuješ neviditelné poškození součástek ESD.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Dva náboje Q₁ = +2 µC a Q₂ = −3 µC jsou vzdáleny r = 0,1 m. Jaká je síla mezi nimi?',
+  [
+    'Zadáno: Q₁ = 2×10⁻⁶ C, Q₂ = 3×10⁻⁶ C, r = 0,1 m, k = 9×10⁹',
+    'F = k · |Q₁ · Q₂| / r²',
+    'F = 9×10⁹ · (2×10⁻⁶ · 3×10⁻⁶) / (0,1)²',
+    'F = 9×10⁹ · 6×10⁻¹² / 0,01',
+    'F = 9×10⁹ · 6×10⁻¹⁰ = 5,4 N',
+    '✅ Síla F = 5,4 N (přitažlivá, náboje mají opačné znaménko)',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2:</strong> Kondenzátor (deskový) má vzdálenost desek d = 2 mm a napětí U = 100 V. Jaká je intenzita elektrického pole?',
+  [
+    'Zadáno: d = 2 mm = 0,002 m, U = 100 V',
+    'E = U / d = 100 / 0,002 = 50 000 V/m = 50 kV/m',
+    '✅ Intenzita pole E = 50 kV/m',
+  ]
+)}
+<div class="tags"><span class="tag">coulomb [C]</span><span class="tag">siločáry</span><span class="tag">permitivita</span><span class="tag">ESD</span><span class="tag">potenciál</span></div>`
+  },
+
+  {
+    id: "ampere", icon: "🤙", theme: "t7", accentVar: "--c7",
+    title: "Ampérovo pravidlo", sub: "Směr magnetického pole kolem vodiče",
+    body: `
+<div class="section-label">Magnetické pole vodiče</div>
+<p>Elektrický proud vytváří kolem vodiče magnetické pole. Toto pole tvoří <strong>soustředné kružnice</strong> kolem vodiče. <strong style="color:var(--c7)">Ampérovo pravidlo</strong> (pravidlo pravé ruky) říká, jak určit směr tohoto pole.</p>
+
+<div class="section-label">Pravidlo pravé ruky — přímý vodič</div>
+<div class="rule-box">
+  <h3 style="color:var(--c7)">Přímý vodič</h3>
+  <p>Uchop vodič <strong>pravou rukou</strong> tak, aby <strong>palec ukazoval ve směru proudu</strong> (konvenčního, od + k −). Ohnuté prsty pak ukazují směr magnetických siločar — jsou to kružnice kolem vodiče.</p>
+</div>
+<div class="rule-box">
+  <h3 style="color:var(--c7)">Cívka (solenoid)</h3>
+  <p>Uchop cívku pravou rukou tak, aby <strong>prsty ukazovaly ve směru proudu v závitech</strong>. Palec pak ukazuje na <strong>severní pól</strong> — místo, odkud vychází magnetické siločáry.</p>
+</div>
+
+<div class="section-label">Síla magnetického pole vodiče</div>
+<div class="formula"><span class="f-label">Přímý vodič:</span><span class="f-eq">B = (µ₀ · I) / (2π · r)</span><span class="f-desc">Tesla [T]</span></div>
+<div class="formula"><span class="f-label">Solenoid:</span><span class="f-eq">B = µ₀ · µᵣ · (N/l) · I</span><span class="f-desc">N/l = závitů na metr</span></div>
+<p><strong>µ₀ = 4π × 10⁻⁷ T·m/A</strong> — permeabilita vakua. Feromagnetická jádra (µᵣ >> 1) enormně zesílí pole.</p>
+
+<div class="section-label">Ampérův zákon (obecný tvar)</div>
+<p>Křivkový integrál magnetické intenzity H po uzavřené smyčce se rovná součtu proudů procházejících plochou ohraničenou smyčkou.</p>
+<div class="formula"><span class="f-label">Ampérův zákon:</span><span class="f-eq">∮ H · dl = ΣI</span><span class="f-desc">základ Maxwell. rovnic</span></div>
+
+<div class="section-label">Interakce dvou vodičů</div>
+<p>Dva rovnoběžné vodiče se stejnosměrnými proudy: pokud proudy tečou stejným směrem, vodiče se <em>přitahují</em>; opačným směrem — <em>odpuzují</em>. Tato síla je základem definice ampéru.</p>
+<div class="tip">V IoT používáš Ampérovo pravidlo u relé (elektromagnetický spínač), motorových ovladačů a kdykoli potřebuješ vědět, kam "míří" magnetické pole cívky.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Přímým vodičem prochází proud I = 5 A. Jaká je intenzita magnetického pole ve vzdálenosti r = 10 cm od vodiče?',
+  [
+    'Zadáno: I = 5 A, r = 0,1 m, µ₀ = 4π×10⁻⁷ ≈ 1,2566×10⁻⁶ T·m/A',
+    'B = µ₀ · I / (2π · r)',
+    'B = (1,2566×10⁻⁶ · 5) / (2π · 0,1)',
+    'B = 6,283×10⁻⁶ / 0,6283',
+    'B = 1×10⁻⁵ T = 10 µT',
+    '✅ B = 10 µT',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2 (kvalitativní):</strong> Vodičem teče proud směrem nahoru (↑). Urči směr magnetického pole ve dvou bodech — vlevo a vpravo od vodiče.',
+  [
+    'Uchop vodič pravou rukou, palec nahoru (↑ = směr proudu)',
+    'Vlevo od vodiče: prsty míří směrem od nás (⊗ — do stránky)',
+    'Vpravo od vodiče: prsty míří směrem k nám (⊙ — ze stránky)',
+    '✅ Vlevo: B jde do stránky ⊗ | Vpravo: B jde ze stránky ⊙',
+  ]
+)}
+<div class="tags"><span class="tag">pravá ruka</span><span class="tag">tesla [T]</span><span class="tag">solenoid</span><span class="tag">µ₀</span><span class="tag">Ampér</span></div>`
+  },
+
+  {
+    id: "fleming", icon: "🖐️", theme: "t8", accentVar: "--c8",
+    title: "Flemingovo pravidlo", sub: "Motorový a generátorový efekt",
+    body: `
+<div class="section-label">O čem to je</div>
+<p><strong style="color:var(--c8)">Flemingova pravidla</strong> (John Ambrose Fleming, 1885) popisují vztah mezi třemi vektory: <em>magnetickým polem B</em>, <em>proudem I</em> a <em>silou/pohybem F</em>. Jsou dvě — jedno pro motor (elektrická energie → mechanická), jedno pro generátor (mechanická → elektrická).</p>
+
+<div class="section-label">Pravidlo levé ruky — MOTOR</div>
+<div class="rule-box">
+  <h3 style="color:var(--c8)">Lorentzova síla / Motorový efekt</h3>
+  <p>Natáhni <strong>levou ruku</strong>:</p>
+  <ul style="margin-top:0.4rem">
+    <li>🔵 <strong>Čtyři prsty</strong> ukazují ve směru <strong>proudu I</strong></li>
+    <li>🔵 <strong>Dlaň</strong> čelí směru přicházejícího <strong>magnetického pole B</strong> (siločáry vcházejí do dlaně)</li>
+    <li>🔵 <strong>Palec</strong> ukazuje směr <strong>síly / pohybu vodiče F</strong></li>
+  </ul>
+  <div class="formula" style="border-color:var(--c8); margin-top:0.7rem">
+    <span class="f-eq">F = B · I · l · sin(α)</span><span class="f-desc">Newton [N]</span>
+  </div>
+  <p style="font-size:0.82rem; color:var(--muted); margin-top:0.4rem">l = délka vodiče v poli, α = úhel mezi vodičem a B (při α=90° je síla maximální)</p>
+</div>
+
+<div class="section-label">Pravidlo pravé ruky — GENERÁTOR</div>
+<div class="rule-box">
+  <h3 style="color:var(--c8)">Elektromagnetická indukce / Generátorový efekt</h3>
+  <p>Natáhni <strong>pravou ruku</strong>:</p>
+  <ul style="margin-top:0.4rem">
+    <li>🔴 <strong>Čtyři prsty</strong> ukazují ve směru <strong>pohybu vodiče</strong></li>
+    <li>🔴 <strong>Dlaň</strong> čelí směru <strong>magnetického pole B</strong></li>
+    <li>🔴 <strong>Palec</strong> (nebo ukazovák) ukazuje směr <strong>indukovaného proudu I</strong></li>
+  </ul>
+</div>
+
+<div class="section-label">Zkratka FBI</div>
+<ul>
+  <li><strong>F</strong> — síla/pohyb → <strong>palec</strong></li>
+  <li><strong>B</strong> — magnetické pole → <strong>dlaň / prsty</strong></li>
+  <li><strong>I</strong> — proud → <strong>prsty / palec</strong></li>
+  <li>Levá ruka = motor | Pravá ruka = generátor</li>
+</ul>
+
+<div class="section-label">Lorentzova síla (obecně)</div>
+<p>Pohybující se náboj v magnetickém poli pociťuje sílu kolmou na oba vektory (rychlost i pole). Tato síla je základem funkce elektromotorů, galvanometrů i urychlovačů částic.</p>
+<div class="formula"><span class="f-label">Lorentz:</span><span class="f-eq">F = q · v · B · sin(α)</span><span class="f-desc">Newton [N]</span></div>
+
+<div class="section-label">Praktické využití</div>
+<ul>
+  <li><strong>DC motor</strong> — proud v cívce + magnetické pole statoru → rotace (levá ruka)</li>
+  <li><strong>Alternátor/dynamo</strong> — rotace vodiče v poli → indukovaný proud (pravá ruka)</li>
+  <li><strong>Reproduktor</strong> — střídavý proud v cívce → pohyb membrány → zvuk</li>
+  <li><strong>Mikrofon</strong> — pohyb membrány → pohyb cívky → indukovaný proud → zvuk</li>
+  <li><strong>IoT:</strong> motorové kontroléry, servo, krokový motor, energy harvesting</li>
+</ul>
+<div class="tip">Dobrý test: motor spotřebuje energii a hýbe se → levá ruka. Generátor se hýbe a vyrábí energii → pravá ruka. Energie vždy teče od pohybu k proudu nebo naopak.</div>
+
+<div class="section-label">Vzorové příklady</div>
+${ex(
+  '📝 <strong>Příklad 1:</strong> Vodič délky l = 0,2 m prochází kolmo magnetickým polem B = 0,5 T. Protéká jím proud I = 3 A. Jaká síla na vodič působí?',
+  [
+    'Zadáno: l = 0,2 m, B = 0,5 T, I = 3 A, α = 90° (sin 90° = 1)',
+    'F = B · I · l · sin(α)',
+    'F = 0,5 · 3 · 0,2 · 1 = 0,3 N',
+    '✅ Výsledek: F = 0,3 N  (směr určíme pravidlem levé ruky)',
+  ]
+)}
+${ex(
+  '📝 <strong>Příklad 2 (kvalitativní):</strong> Vodič se pohybuje dolů (↓) v magnetickém poli B mířícím doprava (→). Urči směr indukovaného proudu pravidlem pravé ruky.',
+  [
+    'Generátor → použijeme PRAVOU ruku',
+    'Prsty = směr pohybu vodiče = dolů (↓)',
+    'Dlaň čelí poli B = doprava (→)',
+    'Palec/ukazovák = směr proudu = ze stránky k nám (⊙)',
+    '✅ Indukovaný proud teče ze stránky směrem k nám ⊙',
+  ]
+)}
+<div class="tags"><span class="tag">levá ruka</span><span class="tag">pravá ruka</span><span class="tag">Lorentz</span><span class="tag">FBI</span><span class="tag">motor</span><span class="tag">generátor</span></div>`
+  }
+];
+
+const grid = document.getElementById('grid');
+const nav = document.getElementById('nav');
+
+const allBtn = document.createElement('button');
+allBtn.textContent = '📚 Vše';
+allBtn.classList.add('active');
+allBtn.onclick = () => {
+  if (typeof search !== 'undefined') { search.value = ''; }
+  document.querySelectorAll('.card').forEach(c => {
+    c.style.display = '';
+    if (c.dataset.raw && c.innerHTML !== c.dataset.raw) c.innerHTML = c.dataset.raw;
+  });
+  document.getElementById('noResults').style.display = 'none';
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  allBtn.classList.add('active');
+};
+nav.appendChild(allBtn);
+
+topics.forEach((t, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = t.icon + ' ' + t.title;
+  btn.style.setProperty('--hover-color', `var(${t.accentVar})`);
+  btn.onclick = () => {
+    if (typeof search !== 'undefined') { search.value = ''; }
+    document.querySelectorAll('.card').forEach(c => {
+      c.style.display = 'none';
+      if (c.dataset.raw && c.innerHTML !== c.dataset.raw) c.innerHTML = c.dataset.raw;
+    });
+    const target = document.getElementById('card-' + t.id);
+    target.style.display = '';
+    target.classList.add('open');
+    document.getElementById('noResults').style.display = 'none';
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+  nav.appendChild(btn);
+
+  const card = document.createElement('div');
+  card.className = 'card ' + t.theme;
+  card.id = 'card-' + t.id;
+  card.innerHTML = `
+    <div class="card-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="card-icon">${t.icon}</div>
+      <div class="card-title">
+        <h2>${t.title}</h2>
+        <span>${t.sub}</span>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="card-body">${t.body}</div>
+  `;
+  grid.appendChild(card);
+  if (i === 0) card.classList.add('open');
+});
+
+/* ---- Vyhledávání ---- */
+const search = document.getElementById('search');
+const noResults = document.getElementById('noResults');
+const cards = [...document.querySelectorAll('.card')];
+// uložíme původní text každé karty pro highlight
+cards.forEach(c => c.dataset.raw = c.innerHTML);
+
+function clearHighlight(card) {
+  if (card.innerHTML !== card.dataset.raw) card.innerHTML = card.dataset.raw;
+}
+
+function runSearch(q) {
+  q = q.trim().toLowerCase();
+  let visible = 0;
+  // při hledání zrušíme filtr z navigace
+  if (q) {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  }
+  cards.forEach(card => {
+    clearHighlight(card);
+    const text = card.textContent.toLowerCase();
+    const match = !q || text.includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) {
+      visible++;
+      if (q) {
+        card.classList.add('open');
+        highlight(card, q);
+      }
+    }
+  });
+  noResults.style.display = visible ? 'none' : 'block';
+}
+
+function highlight(card, q) {
+  const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue.toLowerCase().includes(q)) return NodeFilter.FILTER_REJECT;
+      const p = node.parentElement;
+      if (p && (p.tagName === 'SCRIPT' || p.tagName === 'STYLE' || p.tagName === 'MARK')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const targets = [];
+  while (walker.nextNode()) targets.push(walker.currentNode);
+  targets.forEach(node => {
+    const frag = document.createDocumentFragment();
+    const parts = node.nodeValue.split(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'));
+    parts.forEach(part => {
+      if (part.toLowerCase() === q) {
+        const m = document.createElement('mark');
+        m.textContent = part;
+        frag.appendChild(m);
+      } else if (part) {
+        frag.appendChild(document.createTextNode(part));
+      }
+    });
+    node.parentNode.replaceChild(frag, node);
+  });
+}
+
+let searchTimer;
+search.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => runSearch(search.value), 120);
+});
+
+/* ---- Rozbalit / sbalit vše ---- */
+document.getElementById('expandAll').onclick = () => {
+  cards.forEach(c => { if (c.style.display !== 'none') c.classList.add('open'); });
+};
+document.getElementById('collapseAll').onclick = () => {
+  cards.forEach(c => c.classList.remove('open'));
+};
+
+/* ---- Scroll nahoru ---- */
+const toTop = document.getElementById('toTop');
+window.addEventListener('scroll', () => {
+  toTop.classList.toggle('show', window.scrollY > 400);
+}, { passive: true });
+toTop.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+</script>
+</body>
+</html>
