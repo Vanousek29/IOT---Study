@@ -136,6 +136,31 @@
     border-radius: 3px; padding: 0 1px;
   }
 
+  /* Legenda veličin */
+  .legend {
+    display: grid; grid-template-columns: max-content 1fr;
+    gap: 0.4rem 1.1rem; align-items: baseline;
+    margin: 0.7rem 0; padding: 0.95rem 1.1rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .legend dt {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 0.84rem; color: var(--text); white-space: nowrap;
+  }
+  .legend dd {
+    color: var(--muted); font-size: 0.82rem; line-height: 1.5; margin: 0;
+  }
+  .legend dd b { color: #c8cedf; font-weight: 600; }
+  .t1 .legend dt { color: var(--c1); }
+  .t2 .legend dt { color: var(--c2); }
+  .t3 .legend dt { color: var(--c3); }
+  .t4 .legend dt { color: var(--c4); }
+  .t5 .legend dt { color: var(--c5); }
+  .t6 .legend dt { color: var(--c6); }
+  .t7 .legend dt { color: var(--c7); }
+  .t8 .legend dt { color: var(--c8); }
+
   .grid {
     max-width: 920px; margin: 0 auto;
     display: flex; flex-direction: column; gap: 1.4rem;
@@ -384,6 +409,21 @@ const topics = [
 <p>Kondenzátor <strong>blokuje stejnosměrný proud (DC)</strong> ale <strong>propouští střídavý (AC)</strong>. Čím vyšší frekvence, tím lépe propouští. Reaktance kondenzátoru: X_C = 1 / (2π·f·C). V IoT se kondenzátory používají jako filtry napájení (odstranění šumu), decoupling u mikrokontrolérů, nebo v RC oscilátorech.</p>
 <div class="tip">Při práci s elektrolytickými kondenzátory dávej pozor na polaritu — plus na plus! Přepólovaný elektrolytický kondenzátor může explodovat.</div>
 
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>C</dt><dd><b>kapacita</b> — farad [F]</dd>
+    <dt>Q</dt><dd><b>elektrický náboj</b> — coulomb [C]</dd>
+    <dt>U</dt><dd><b>napětí</b> — volt [V]</dd>
+    <dt>E</dt><dd><b>energie</b> — joule [J]</dd>
+    <dt>C₁, C₂</dt><dd><b>kapacity jednotlivých kondenzátorů</b> — [F]</dd>
+    <dt>ε₀</dt><dd><b>permitivita vakua</b> — 8,85·10⁻¹² F/m</dd>
+    <dt>εᵣ</dt><dd><b>relativní permitivita dielektrika</b> — bezrozměrná</dd>
+    <dt>A</dt><dd><b>plocha desek</b> — [m²]</dd>
+    <dt>d</dt><dd><b>vzdálenost desek</b> — [m]</dd>
+    <dt>X_C</dt><dd><b>kapacitní reaktance</b> — [Ω]</dd>
+    <dt>f</dt><dd><b>frekvence</b> — hertz [Hz]</dd>
+  </dl>
+
 <div class="section-label">Vzorové příklady</div>
 ${ex(
   '📝 <strong>Příklad 1:</strong> Kondenzátor má kapacitu C = 100 µF. Nabijeme ho na napětí U = 12 V. Jaký náboj je na něm uložen a jaká energie?',
@@ -437,6 +477,24 @@ ${ex(
 <div class="formula"><span class="f-label">Transformátor:</span><span class="f-eq">U₁/U₂ = N₁/N₂</span><span class="f-desc"></span></div>
 <div class="tip">V IoT se cívky vyskytují v DC-DC konvertorech (buck/boost), bezdrátovém nabíjení (Qi standard) a RFID čtečkách.</div>
 
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>L</dt><dd><b>induktivita</b> — henry [H]</dd>
+    <dt>U</dt><dd><b>(indukované) napětí</b> — volt [V]</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>ΔI / Δt</dt><dd><b>změna proudu za čas</b> — [A/s]</dd>
+    <dt>E</dt><dd><b>energie magnetického pole</b> — joule [J]</dd>
+    <dt>N</dt><dd><b>počet závitů</b> — bezrozměrné</dd>
+    <dt>Φ</dt><dd><b>magnetický tok</b> — weber [Wb]</dd>
+    <dt>µ₀</dt><dd><b>permeabilita vakua</b> — 4π·10⁻⁷ T·m/A</dd>
+    <dt>µᵣ</dt><dd><b>relativní permeabilita jádra</b> — bezrozměrná</dd>
+    <dt>A</dt><dd><b>průřez jádra</b> — [m²]</dd>
+    <dt>l</dt><dd><b>délka cívky</b> — [m]</dd>
+    <dt>X_L</dt><dd><b>induktivní reaktance</b> — [Ω]</dd>
+    <dt>U₁, U₂</dt><dd><b>napětí na primáru / sekundáru</b> — [V]</dd>
+    <dt>N₁, N₂</dt><dd><b>počet závitů primáru / sekundáru</b></dd>
+  </dl>
+
 <div class="section-label">Vzorové příklady</div>
 ${ex(
   '📝 <strong>Příklad 1:</strong> Cívkou prochází proud, který se změní z 0 A na 4 A za 0,02 s. Cívka má induktivitu L = 0,5 H. Jaké napětí se indukuje?',
@@ -489,6 +547,19 @@ ${ex(
 <div class="formula"><span class="f-label">Odpor vodiče:</span><span class="f-eq">R = ρ · l / A</span><span class="f-desc">ρ = rezistivita, l = délka, A = průřez</span></div>
 
 <div class="tip">Ohmův zákon neplatí pro nelineární součástky: diody, tranzistory, LED — tam se odpor mění s napětím a proudem.</div>
+
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>U</dt><dd><b>napětí</b> — volt [V]</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>R</dt><dd><b>odpor</b> — ohm [Ω]</dd>
+    <dt>P</dt><dd><b>elektrický výkon</b> — watt [W]</dd>
+    <dt>E</dt><dd><b>energie</b> — joule [J]</dd>
+    <dt>t</dt><dd><b>čas</b> — sekunda [s]</dd>
+    <dt>ρ</dt><dd><b>rezistivita materiálu</b> — [Ω·m]</dd>
+    <dt>l</dt><dd><b>délka vodiče</b> — [m]</dd>
+    <dt>A</dt><dd><b>průřez vodiče</b> — [m²]</dd>
+  </dl>
 
 <div class="section-label">Vzorové příklady</div>
 ${ex(
@@ -561,6 +632,15 @@ ${ex(
 
 <div class="tip">Zkratka: KCL = Current = uzly | KVL = Voltage = smyčky. "K-C-L jako Proud (Current), K-V-L jako Napětí (Voltage)".</div>
 
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>I</dt><dd><b>proud ve větvi</b> — ampér [A]</dd>
+    <dt>U</dt><dd><b>napětí</b> — volt [V]</dd>
+    <dt>ΣI</dt><dd><b>součet proudů v uzlu</b> — [A]</dd>
+    <dt>ΣU</dt><dd><b>součet napětí v uzavřené smyčce</b> — [V]</dd>
+    <dt>R</dt><dd><b>odpor</b> — ohm [Ω]</dd>
+  </dl>
+
 <div class="section-label">Vzorové příklady</div>
 ${ex(
   '📝 <strong>Příklad 1 (KCL):</strong> Do uzlu A přitéká I₁ = 5 A a I₂ = 3 A. Z uzlu odtékají I₃ a I₄, přičemž I₄ = 2 A. Urči I₃.',
@@ -626,6 +706,18 @@ ${ex(
 </ul>
 <div class="tip">Nikdy nemíchej staré a nové baterie v paralelním zapojení — starší baterie se může začít nabíjet z novější a přehřát nebo explodovat.</div>
 
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>U</dt><dd><b>svorkové napětí (pod zátěží)</b> — volt [V]</dd>
+    <dt>EMF</dt><dd><b>elektromotorická síla (napětí naprázdno)</b> — volt [V]</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>R_int</dt><dd><b>vnitřní odpor baterie</b> — ohm [Ω]</dd>
+    <dt>R</dt><dd><b>odpor zátěže</b> — ohm [Ω]</dd>
+    <dt>Q</dt><dd><b>kapacita baterie</b> — ampérhodina [Ah]</dd>
+    <dt>t</dt><dd><b>čas</b> — hodina [h]</dd>
+    <dt>E</dt><dd><b>energie</b> — watthodina [Wh]</dd>
+  </dl>
+
 <div class="section-label">Vzorové příklady</div>
 ${ex(
   '📝 <strong>Příklad 1:</strong> Baterie má EMF = 9 V a vnitřní odpor R_int = 1 Ω. Připojíme zátěž R = 8 Ω. Jaký proud teče a jaké napětí je na svorkách baterie?',
@@ -679,6 +771,20 @@ ${ex(
 <p><strong>ESD (Electrostatic Discharge)</strong> — výboj statické elektřiny může zničit citlivé součástky. Lidské tělo může nést náboj tisíců voltů — jemné MOSFET tranzistory a mikrochipy se snadno poškodí.</p>
 <div class="tip">Při práci s elektronikou vždy používej antistatický pásek na zápěstí a pracuj na antistatické podložce — jinak riskuješ neviditelné poškození součástek ESD.</div>
 
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>F</dt><dd><b>elektrostatická síla</b> — newton [N]</dd>
+    <dt>k</dt><dd><b>Coulombova konstanta</b> — 9·10⁹ N·m²/C²</dd>
+    <dt>Q, Q₁, Q₂</dt><dd><b>elektrické náboje</b> — coulomb [C]</dd>
+    <dt>r</dt><dd><b>vzdálenost nábojů</b> — [m]</dd>
+    <dt>E</dt><dd><b>intenzita elektrického pole</b> — [V/m]</dd>
+    <dt>q</dt><dd><b>zkušební náboj</b> — coulomb [C]</dd>
+    <dt>φ</dt><dd><b>elektrický potenciál</b> — volt [V]</dd>
+    <dt>U</dt><dd><b>napětí (rozdíl potenciálů)</b> — volt [V]</dd>
+    <dt>d</dt><dd><b>vzdálenost desek</b> — [m]</dd>
+    <dt>ε₀</dt><dd><b>permitivita vakua</b> — 8,85·10⁻¹² F/m</dd>
+  </dl>
+
 <div class="section-label">Vzorové příklady</div>
 ${ex(
   '📝 <strong>Příklad 1:</strong> Dva náboje Q₁ = +2 µC a Q₂ = −3 µC jsou vzdáleny r = 0,1 m. Jaká je síla mezi nimi?',
@@ -731,6 +837,19 @@ ${ex(
 <div class="section-label">Interakce dvou vodičů</div>
 <p>Dva rovnoběžné vodiče se stejnosměrnými proudy: pokud proudy tečou stejným směrem, vodiče se <em>přitahují</em>; opačným směrem — <em>odpuzují</em>. Tato síla je základem definice ampéru.</p>
 <div class="tip">V IoT používáš Ampérovo pravidlo u relé (elektromagnetický spínač), motorových ovladačů a kdykoli potřebuješ vědět, kam "míří" magnetické pole cívky.</div>
+
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>B</dt><dd><b>magnetická indukce</b> — tesla [T]</dd>
+    <dt>µ₀</dt><dd><b>permeabilita vakua</b> — 4π·10⁻⁷ T·m/A</dd>
+    <dt>µᵣ</dt><dd><b>relativní permeabilita jádra</b> — bezrozměrná</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>r</dt><dd><b>vzdálenost od vodiče</b> — [m]</dd>
+    <dt>N</dt><dd><b>počet závitů</b> — bezrozměrné</dd>
+    <dt>l</dt><dd><b>délka cívky</b> — [m]</dd>
+    <dt>H</dt><dd><b>intenzita magnetického pole</b> — [A/m]</dd>
+    <dt>ΣI</dt><dd><b>součet proudů procházejících smyčkou</b> — [A]</dd>
+  </dl>
 
 <div class="section-label">Vzorové příklady</div>
 ${ex(
@@ -810,6 +929,17 @@ ${ex(
   <li><strong>IoT:</strong> motorové kontroléry, servo, krokový motor, energy harvesting</li>
 </ul>
 <div class="tip">Dobrý test: motor spotřebuje energii a hýbe se → levá ruka. Generátor se hýbe a vyrábí energii → pravá ruka. Energie vždy teče od pohybu k proudu nebo naopak.</div>
+
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>F</dt><dd><b>síla na vodič / náboj</b> — newton [N]</dd>
+    <dt>B</dt><dd><b>magnetická indukce</b> — tesla [T]</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>l</dt><dd><b>délka vodiče v poli</b> — [m]</dd>
+    <dt>α</dt><dd><b>úhel mezi vodičem a polem B</b> — stupně [°]</dd>
+    <dt>q</dt><dd><b>elektrický náboj</b> — coulomb [C]</dd>
+    <dt>v</dt><dd><b>rychlost náboje</b> — [m/s]</dd>
+  </dl>
 
 <div class="section-label">Vzorové příklady</div>
 ${ex(
