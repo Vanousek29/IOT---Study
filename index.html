@@ -29,6 +29,7 @@
     --c6: #ce93d8;
     --c7: #80deea;
     --c8: #ef9a9a;
+    --c9: #9fa8da;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -160,6 +161,49 @@
   .t6 .legend dt { color: var(--c6); }
   .t7 .legend dt { color: var(--c7); }
   .t8 .legend dt { color: var(--c8); }
+  .t9 .legend dt { color: var(--c9); }
+
+  /* Převodník jednotek */
+  .converter {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.1rem; margin: 0.7rem 0;
+  }
+  .converter-row {
+    display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;
+  }
+  .converter input, .converter select {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.84rem;
+    padding: 0.5rem 0.6rem; border-radius: 8px; cursor: pointer;
+  }
+  .converter input { width: 120px; cursor: text; }
+  .converter input:focus, .converter select:focus { outline: none; border-color: var(--c9); }
+  .converter .arrow { color: var(--muted); font-size: 1.15rem; }
+  .conv-result {
+    margin-top: 0.95rem; padding: 0.8rem 1rem;
+    background: rgba(159,168,218,0.1); border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.98rem;
+    color: var(--c9); font-weight: 700; word-break: break-word;
+  }
+
+  /* Tabulky jednotek */
+  .utable {
+    width: 100%; border-collapse: collapse; margin: 0.7rem 0; font-size: 0.84rem;
+  }
+  .utable th, .utable td {
+    text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border);
+  }
+  .utable th {
+    color: var(--muted); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400;
+  }
+  .utable td:first-child {
+    font-family: 'JetBrains Mono', monospace; color: var(--c9); font-weight: 700;
+  }
+  .utable code {
+    font-family: 'JetBrains Mono', monospace; color: #c8cedf;
+    background: rgba(255,255,255,0.05); padding: 0.05rem 0.35rem; border-radius: 4px;
+  }
 
   .grid {
     max-width: 920px; margin: 0 auto;
@@ -324,6 +368,8 @@
   .t7 .formula { border-color: var(--c7); }
   .t8 .card-icon { background: rgba(239,154,154,0.12); }
   .t8 .formula { border-color: var(--c8); }
+  .t9 .card-icon { background: rgba(159,168,218,0.12); }
+  .t9 .formula { border-color: var(--c9); }
 </style>
 </head>
 <body>
@@ -370,6 +416,34 @@ function toggleEx(btn, id) {
   sol.style.display = shown ? 'none' : 'block';
   btn.classList.toggle('shown', !shown);
   btn.childNodes[1].textContent = shown ? ' Zobrazit řešení' : ' Skrýt řešení';
+}
+
+function formatNum(n) {
+  if (!isFinite(n)) return '—';
+  if (n === 0) return '0';
+  const abs = Math.abs(n);
+  if (abs >= 1e13 || abs < 1e-9) {
+    return n.toExponential(2).replace(/e([+-]?\d+)/, (m, e) => ' · 10^' + e.replace('+', ''));
+  }
+  return parseFloat(n.toPrecision(7)).toLocaleString('cs-CZ');
+}
+
+function convertUnit() {
+  const valEl = document.getElementById('conv-val');
+  const fromEl = document.getElementById('conv-from');
+  const toEl = document.getElementById('conv-to');
+  const unitEl = document.getElementById('conv-unit');
+  const out = document.getElementById('conv-result');
+  if (!valEl || !out) return;
+  const val = parseFloat(valEl.value);
+  if (isNaN(val)) { out.textContent = '— zadej číslo —'; return; }
+  const from = parseInt(fromEl.value, 10);
+  const to = parseInt(toEl.value, 10);
+  const unit = unitEl.value;
+  const fromSym = fromEl.selectedOptions[0].dataset.sym || '';
+  const toSym = toEl.selectedOptions[0].dataset.sym || '';
+  const result = val * Math.pow(10, from - to);
+  out.textContent = formatNum(val) + ' ' + fromSym + unit + '  =  ' + formatNum(result) + ' ' + toSym + unit;
 }
 
 const topics = [
@@ -962,6 +1036,104 @@ ${ex(
   ]
 )}
 <div class="tags"><span class="tag">levá ruka</span><span class="tag">pravá ruka</span><span class="tag">Lorentz</span><span class="tag">FBI</span><span class="tag">motor</span><span class="tag">generátor</span></div>`
+  },
+
+  {
+    id: "jednotky", icon: "📏", theme: "t9", accentVar: "--c9",
+    title: "Jednotky & převody", sub: "SI předpony, převodník a přehled jednotek",
+    body: `
+<div class="section-label">Interaktivní převodník</div>
+<p>Zadej hodnotu, vyber předponu „z“ a „na“ — výsledek se přepočítá okamžitě. Funguje pro libovolnou jednotku (jen ovlivňuje popisek).</p>
+<div class="converter">
+  <div class="converter-row">
+    <input type="number" id="conv-val" value="1" step="any" oninput="convertUnit()" aria-label="Hodnota">
+    <select id="conv-from" onchange="convertUnit()" aria-label="Z předpony">
+      <option value="9" data-sym="G">giga (G) · 10⁹</option>
+      <option value="6" data-sym="M">mega (M) · 10⁶</option>
+      <option value="3" data-sym="k">kilo (k) · 10³</option>
+      <option value="0" data-sym="" selected>základní · 1</option>
+      <option value="-3" data-sym="m">mili (m) · 10⁻³</option>
+      <option value="-6" data-sym="µ">mikro (µ) · 10⁻⁶</option>
+      <option value="-9" data-sym="n">nano (n) · 10⁻⁹</option>
+      <option value="-12" data-sym="p">piko (p) · 10⁻¹²</option>
+    </select>
+    <span class="arrow">→</span>
+    <select id="conv-to" onchange="convertUnit()" aria-label="Na předponu">
+      <option value="9" data-sym="G">giga (G) · 10⁹</option>
+      <option value="6" data-sym="M">mega (M) · 10⁶</option>
+      <option value="3" data-sym="k">kilo (k) · 10³</option>
+      <option value="0" data-sym="">základní · 1</option>
+      <option value="-3" data-sym="m">mili (m) · 10⁻³</option>
+      <option value="-6" data-sym="µ" selected>mikro (µ) · 10⁻⁶</option>
+      <option value="-9" data-sym="n">nano (n) · 10⁻⁹</option>
+      <option value="-12" data-sym="p">piko (p) · 10⁻¹²</option>
+    </select>
+    <select id="conv-unit" onchange="convertUnit()" aria-label="Jednotka">
+      <option value="F">farad (F)</option>
+      <option value="C">coulomb (C)</option>
+      <option value="V">volt (V)</option>
+      <option value="A">ampér (A)</option>
+      <option value="Ω">ohm (Ω)</option>
+      <option value="H">henry (H)</option>
+      <option value="W">watt (W)</option>
+      <option value="J">joule (J)</option>
+      <option value="Hz">hertz (Hz)</option>
+      <option value="Wb">weber (Wb)</option>
+      <option value="T">tesla (T)</option>
+      <option value="Ah">ampérhodina (Ah)</option>
+    </select>
+  </div>
+  <div class="conv-result" id="conv-result">—</div>
+</div>
+
+<div class="section-label">Předpony soustavy SI</div>
+<table class="utable">
+  <thead><tr><th>Předpona</th><th>Symbol</th><th>Násobitel</th><th>Slovy</th></tr></thead>
+  <tbody>
+    <tr><td>giga</td><td><code>G</code></td><td><code>10⁹</code></td><td>miliarda×</td></tr>
+    <tr><td>mega</td><td><code>M</code></td><td><code>10⁶</code></td><td>milion×</td></tr>
+    <tr><td>kilo</td><td><code>k</code></td><td><code>10³</code></td><td>tisíc×</td></tr>
+    <tr><td>základní</td><td><code>—</code></td><td><code>10⁰ = 1</code></td><td>—</td></tr>
+    <tr><td>mili</td><td><code>m</code></td><td><code>10⁻³</code></td><td>tisícina</td></tr>
+    <tr><td>mikro</td><td><code>µ</code></td><td><code>10⁻⁶</code></td><td>miliontina</td></tr>
+    <tr><td>nano</td><td><code>n</code></td><td><code>10⁻⁹</code></td><td>miliardtina</td></tr>
+    <tr><td>piko</td><td><code>p</code></td><td><code>10⁻¹²</code></td><td>biliontina</td></tr>
+  </tbody>
+</table>
+<p style="font-size:0.82rem; color:var(--muted)">Mezi sousedními „trojkovými“ předponami (m → µ → n → p) je vždy faktor <strong>1000</strong> (10³).</p>
+
+<div class="section-label">Elektrotechnické jednotky</div>
+<table class="utable">
+  <thead><tr><th>Veličina</th><th>Jednotka</th><th>Symbol</th></tr></thead>
+  <tbody>
+    <tr><td>Napětí</td><td>volt</td><td><code>V</code></td></tr>
+    <tr><td>Proud</td><td>ampér</td><td><code>A</code></td></tr>
+    <tr><td>Odpor</td><td>ohm</td><td><code>Ω</code></td></tr>
+    <tr><td>Kapacita</td><td>farad</td><td><code>F</code></td></tr>
+    <tr><td>Elektrický náboj</td><td>coulomb</td><td><code>C</code></td></tr>
+    <tr><td>Induktivita</td><td>henry</td><td><code>H</code></td></tr>
+    <tr><td>Výkon</td><td>watt</td><td><code>W</code></td></tr>
+    <tr><td>Energie</td><td>joule</td><td><code>J</code></td></tr>
+    <tr><td>Frekvence</td><td>hertz</td><td><code>Hz</code></td></tr>
+    <tr><td>Magnetický tok</td><td>weber</td><td><code>Wb</code></td></tr>
+    <tr><td>Magnetická indukce</td><td>tesla</td><td><code>T</code></td></tr>
+    <tr><td>Kapacita baterie</td><td>ampérhodina</td><td><code>Ah</code></td></tr>
+  </tbody>
+</table>
+
+<div class="section-label">Časté převody zpaměti</div>
+<ul>
+  <li><strong>Kapacita:</strong> 1 F = 10³ mF = 10⁶ µF = 10⁹ nF = 10¹² pF</li>
+  <li><strong>Proud:</strong> 1 A = 1 000 mA = 10⁶ µA</li>
+  <li><strong>Napětí:</strong> 1 V = 1 000 mV · 1 kV = 1 000 V</li>
+  <li><strong>Odpor:</strong> 1 kΩ = 1 000 Ω · 1 MΩ = 10⁶ Ω</li>
+  <li><strong>Induktivita:</strong> 1 H = 10³ mH = 10⁶ µH</li>
+  <li><strong>Kapacita baterie:</strong> 1 Ah = 1 000 mAh</li>
+  <li><strong>Výkon:</strong> 1 kW = 1 000 W · 1 W = 1 000 mW</li>
+  <li><strong>Elementární náboj:</strong> e = 1,6 · 10⁻¹⁹ C</li>
+</ul>
+<div class="tip">Z větší jednotky na menší (F → µF) číslo <strong>roste</strong>, z menší na větší (mA → A) <strong>klesá</strong>. Stačí posouvat desetinnou čárku po trojicích.</div>
+<div class="tags"><span class="tag">SI předpony</span><span class="tag">piko</span><span class="tag">nano</span><span class="tag">mikro</span><span class="tag">mili</span><span class="tag">kilo</span><span class="tag">mega</span></div>`
   }
 ];
 
@@ -1019,6 +1191,9 @@ topics.forEach((t, i) => {
   grid.appendChild(card);
   if (i === 0) card.classList.add('open');
 });
+
+/* ---- Inicializace převodníku ---- */
+if (document.getElementById('conv-val')) convertUnit();
 
 /* ---- Vyhledávání ---- */
 const search = document.getElementById('search');
