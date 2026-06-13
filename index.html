@@ -370,6 +370,64 @@
   .t8 .formula { border-color: var(--c8); }
   .t9 .card-icon { background: rgba(159,168,218,0.12); }
   .t9 .formula { border-color: var(--c9); }
+
+  /* Filtr obtížnosti */
+  .diff-filter {
+    max-width: 920px; margin: 0 auto 1.6rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  }
+  .diff-filter-label { font-size: 0.78rem; color: var(--muted); margin-right: 0.2rem; }
+  .diff-chip {
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    padding: 0.4rem 0.85rem; border-radius: 999px;
+    font-family: 'Sora', sans-serif; font-size: 0.76rem; cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    display: flex; align-items: center; gap: 0.45rem;
+  }
+  .diff-chip.d-lehke::before, .diff-chip.d-stredni::before, .diff-chip.d-tezke::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+  }
+  .diff-chip.d-lehke::before { background: var(--c2); }
+  .diff-chip.d-stredni::before { background: var(--c3); }
+  .diff-chip.d-tezke::before { background: var(--c8); }
+  .diff-chip:hover { color: var(--text); border-color: var(--muted); }
+  .diff-chip.active { color: var(--text); border-color: currentColor; background: var(--surface2); }
+
+  /* Hlavička příkladu + obtížnostní odznak */
+  .ex-top {
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+    padding: 0.85rem 1rem 0.2rem;
+  }
+  .diff-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+    padding: 0.22rem 0.6rem; border-radius: 999px; white-space: nowrap;
+  }
+  .diff-badge.d-lehke { background: rgba(129,199,132,0.16); color: var(--c2); }
+  .diff-badge.d-stredni { background: rgba(255,183,77,0.16); color: var(--c3); }
+  .diff-badge.d-tezke { background: rgba(239,154,154,0.16); color: var(--c8); }
+  .ex-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .example .example-q { padding: 0.4rem 1rem 0.85rem; }
+
+  /* Postup — číslované kroky */
+  .example-solution .steps {
+    margin: 0; padding: 0 0 0 1.5rem; list-style: decimal;
+  }
+  .example-solution .steps li {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+    color: #c8cedf; line-height: 1.6; margin-bottom: 0.45rem; padding-left: 0.25rem;
+  }
+  .example-solution .steps li::marker { color: var(--muted); font-weight: 700; }
+  .example-solution .result {
+    margin-top: 0.8rem; padding-top: 0.7rem; border-top: 1px solid var(--border);
+    color: var(--c2); font-weight: 700; font-size: 0.86rem;
+    font-family: 'JetBrains Mono', monospace; line-height: 1.55;
+  }
+
+  /* Filtr obtížnosti — skrývání nevyhovujících příkladů */
+  body[data-diff="lehke"]  .example:not([data-diff="lehke"]),
+  body[data-diff="stredni"] .example:not([data-diff="stredni"]),
+  body[data-diff="tezke"]  .example:not([data-diff="tezke"]) { display: none; }
 </style>
 </head>
 <body>
@@ -390,32 +448,57 @@
   <button class="act" id="collapseAll">Sbalit vše</button>
 </div>
 
+<div class="diff-filter" id="diffFilter">
+  <span class="diff-filter-label">Obtížnost příkladů:</span>
+  <button class="diff-chip active" data-diff="all">Vše</button>
+  <button class="diff-chip d-lehke" data-diff="lehke">Lehké</button>
+  <button class="diff-chip d-stredni" data-diff="stredni">Střední</button>
+  <button class="diff-chip d-tezke" data-diff="tezke">Těžké</button>
+</div>
+
 <div class="grid" id="grid"></div>
 <div class="no-results" id="noResults">Nic nenalezeno — zkus jiný výraz.</div>
 
 <button class="to-top" id="toTop" aria-label="Nahoru">↑</button>
 
+<script src="examples-data.js"></script>
 <script>
-function ex(q, steps, color) {
-  const id = Math.random().toString(36).slice(2);
-  const stepsHtml = steps.map(s => `<div class="step">${s}</div>`).join('');
-  const last = steps[steps.length - 1];
-  return `
-    <div class="example">
-      <div class="example-q">${q}</div>
-      <button class="example-toggle" onclick="toggleEx(this,'sol-${id}')">
-        <span class="arr">▶</span> Zobrazit řešení
-      </button>
-      <div class="example-solution" id="sol-${id}">${stepsHtml}</div>
-    </div>`;
+const DIFF_LABEL = { lehke: 'Lehké', stredni: 'Střední', tezke: 'Těžké' };
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-function toggleEx(btn, id) {
+let exSeq = 0;
+function renderExamples(topicId) {
+  const list = (window.exData && window.exData[topicId]) || [];
+  return list.map(e => {
+    const id = 'st-' + (++exSeq);
+    const parts = e.title.split(/\s+—\s+/);
+    const tag = parts.shift();
+    const sub = parts.join(' — ');
+    const steps = e.steps.map(s => '<li>' + esc(s) + '</li>').join('');
+    return `
+    <div class="example" data-diff="${e.diff}">
+      <div class="ex-top">
+        <span class="diff-badge d-${e.diff}">${DIFF_LABEL[e.diff] || ''}</span>
+        <span class="ex-tag">${esc(tag)}${sub ? ' · ' + esc(sub) : ''}</span>
+      </div>
+      <div class="example-q">${esc(e.q)}</div>
+      <button class="example-toggle" onclick="toggleStep(this,'${id}')">
+        <span class="arr">▶</span> Zobrazit postup
+      </button>
+      <div class="example-solution" id="${id}">
+        <ol class="steps">${steps}</ol>
+        <div class="result">✅ Výsledek: ${esc(e.result)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleStep(btn, id) {
   const sol = document.getElementById(id);
   const shown = sol.style.display === 'block';
   sol.style.display = shown ? 'none' : 'block';
   btn.classList.toggle('shown', !shown);
-  btn.childNodes[1].textContent = shown ? ' Zobrazit řešení' : ' Skrýt řešení';
+  btn.childNodes[1].textContent = shown ? ' Zobrazit postup' : ' Skrýt postup';
 }
 
 function formatNum(n) {
@@ -499,24 +582,7 @@ const topics = [
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Kondenzátor má kapacitu C = 100 µF. Nabijeme ho na napětí U = 12 V. Jaký náboj je na něm uložen a jaká energie?',
-  [
-    'Zadáno: C = 100 µF = 100 × 10⁻⁶ F,  U = 12 V',
-    'Náboj:  Q = C · U = 100×10⁻⁶ · 12 = 1,2 × 10⁻³ C = 1,2 mC',
-    'Energie: E = ½ · C · U² = 0,5 · 100×10⁻⁶ · 144 = 7,2 × 10⁻³ J = 7,2 mJ',
-    '✅ Výsledek: Q = 1,2 mC,  E = 7,2 mJ',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2:</strong> Kondenzátory C₁ = 10 µF a C₂ = 40 µF jsou zapojeny paralelně. Jaká je výsledná kapacita? A co při sériovém zapojení?',
-  [
-    'Paralelní: C = C₁ + C₂ = 10 + 40 = 50 µF',
-    'Sériové:   1/C = 1/C₁ + 1/C₂ = 1/10 + 1/40 = 4/40 + 1/40 = 5/40',
-    '           C = 40/5 = 8 µF',
-    '✅ Paralelně: 50 µF  |  Sériově: 8 µF',
-  ]
-)}
+${renderExamples('kondenzator')}
 <div class="tags"><span class="tag">farad [F]</span><span class="tag">dielektrikum</span><span class="tag">náboj Q</span><span class="tag">decoupling</span><span class="tag">reaktance</span></div>`
   },
 
@@ -570,24 +636,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Cívkou prochází proud, který se změní z 0 A na 4 A za 0,02 s. Cívka má induktivitu L = 0,5 H. Jaké napětí se indukuje?',
-  [
-    'Zadáno: L = 0,5 H,  ΔI = 4 A,  Δt = 0,02 s',
-    'Dosadíme: U = −L · (ΔI/Δt) = −0,5 · (4 / 0,02)',
-    'U = −0,5 · 200 = −100 V',
-    '✅ Výsledek: |U| = 100 V  (znaménko minus = Lenzův zákon)',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2:</strong> Transformátor má primární cívku s N₁ = 500 závitů a sekundární s N₂ = 50 závitů. Na primáru je U₁ = 230 V. Jaké napětí bude na sekundáru?',
-  [
-    'Zadáno: N₁ = 500, N₂ = 50, U₁ = 230 V',
-    'Vzorec: U₁/U₂ = N₁/N₂  →  U₂ = U₁ · (N₂/N₁)',
-    'U₂ = 230 · (50/500) = 230 · 0,1 = 23 V',
-    '✅ Výsledek: U₂ = 23 V  (transformátor snižuje napětí 10×)',
-  ]
-)}
+${renderExamples('civky')}
 <div class="tags"><span class="tag">henry [H]</span><span class="tag">indukce</span><span class="tag">Faraday</span><span class="tag">Lenz</span><span class="tag">transformátor</span></div>`
   },
 
@@ -636,35 +685,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> K baterii 9 V připojíme rezistor R = 470 Ω. Jaký proud prochází obvodem a jaký výkon rezistor spotřebuje?',
-  [
-    'Zadáno: U = 9 V,  R = 470 Ω',
-    'Proud: I = U / R = 9 / 470 ≈ 0,01915 A ≈ 19,1 mA',
-    'Výkon: P = U · I = 9 · 0,01915 ≈ 0,172 W = 172 mW',
-    '(nebo P = U²/R = 81/470 ≈ 0,172 W)',
-    '✅ I ≈ 19,1 mA,  P ≈ 172 mW',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2:</strong> Máme tři rezistory R₁ = 100 Ω, R₂ = 200 Ω, R₃ = 300 Ω. Jaký je výsledný odpor a) v sérii, b) paralelně?',
-  [
-    'a) Sériové: R = R₁ + R₂ + R₃ = 100 + 200 + 300 = 600 Ω',
-    'b) Paralelní: 1/R = 1/100 + 1/200 + 1/300',
-    '   = 6/600 + 3/600 + 2/600 = 11/600',
-    '   R = 600/11 ≈ 54,5 Ω',
-    '✅ Sériově: 600 Ω  |  Paralelně: ≈ 54,5 Ω',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 3 (dělič napětí):</strong> Napájení 5 V, R₁ = 10 kΩ, R₂ = 10 kΩ. Jaké napětí je na R₂?',
-  [
-    'Zadáno: U = 5 V, R₁ = R₂ = 10 000 Ω',
-    'U₂ = U · R₂ / (R₁ + R₂) = 5 · 10000 / (10000 + 10000)',
-    'U₂ = 5 · 10000 / 20000 = 5 · 0,5 = 2,5 V',
-    '✅ Výsledek: U₂ = 2,5 V  (stejné odpory = napětí přesně na půl)',
-  ]
-)}
+${renderExamples('ohm')}
 <div class="tags"><span class="tag">volt [V]</span><span class="tag">ampér [A]</span><span class="tag">ohm [Ω]</span><span class="tag">watt [W]</span><span class="tag">dělič napětí</span></div>`
   },
 
@@ -716,28 +737,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1 (KCL):</strong> Do uzlu A přitéká I₁ = 5 A a I₂ = 3 A. Z uzlu odtékají I₃ a I₄, přičemž I₄ = 2 A. Urči I₃.',
-  [
-    'KCL: ΣI_vstup = ΣI_výstup',
-    'I₁ + I₂ = I₃ + I₄',
-    '5 + 3 = I₃ + 2',
-    'I₃ = 8 − 2 = 6 A',
-    '✅ Výsledek: I₃ = 6 A',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2 (KVL):</strong> V sérii: baterie U = 12 V, rezistor R₁ = 100 Ω, rezistor R₂ = 200 Ω. Jaký proud prochází a jaký je úbytek napětí na každém rezistoru?',
-  [
-    'KVL smyčka: U − U_R₁ − U_R₂ = 0',
-    'U = I · R₁ + I · R₂ = I · (R₁ + R₂)',
-    'I = U / (R₁ + R₂) = 12 / 300 = 0,04 A = 40 mA',
-    'U_R₁ = I · R₁ = 0,04 · 100 = 4 V',
-    'U_R₂ = I · R₂ = 0,04 · 200 = 8 V',
-    'Ověření: 4 + 8 = 12 V ✓',
-    '✅ I = 40 mA,  U_R₁ = 4 V,  U_R₂ = 8 V',
-  ]
-)}
+${renderExamples('kirchhoff')}
 <div class="tags"><span class="tag">uzel</span><span class="tag">smyčka</span><span class="tag">KCL</span><span class="tag">KVL</span><span class="tag">soustava rovnic</span></div>`
   },
 
@@ -793,24 +793,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Baterie má EMF = 9 V a vnitřní odpor R_int = 1 Ω. Připojíme zátěž R = 8 Ω. Jaký proud teče a jaké napětí je na svorkách baterie?',
-  [
-    'Celkový odpor: R_celk = R_int + R = 1 + 8 = 9 Ω',
-    'Proud: I = EMF / R_celk = 9 / 9 = 1 A',
-    'Svorky: U = EMF − I · R_int = 9 − 1·1 = 8 V',
-    '(nebo U = I · R = 1 · 8 = 8 V ✓)',
-    '✅ I = 1 A,  U_svorky = 8 V',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2:</strong> Li-Ion baterie má kapacitu 3000 mAh. Zařízení odebírá průměrně 150 mA. Jak dlouho vydrží?',
-  [
-    'Zadáno: Q = 3000 mAh,  I = 150 mA',
-    't = Q / I = 3000 / 150 = 20 hodin',
-    '✅ Výsledek: baterie vydrží 20 hodin',
-  ]
-)}
+${renderExamples('baterie')}
 <div class="tags"><span class="tag">EMF</span><span class="tag">Li-Ion</span><span class="tag">kapacita [Ah]</span><span class="tag">vnitřní odpor</span><span class="tag">C-rating</span></div>`
   },
 
@@ -860,25 +843,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Dva náboje Q₁ = +2 µC a Q₂ = −3 µC jsou vzdáleny r = 0,1 m. Jaká je síla mezi nimi?',
-  [
-    'Zadáno: Q₁ = 2×10⁻⁶ C, Q₂ = 3×10⁻⁶ C, r = 0,1 m, k = 9×10⁹',
-    'F = k · |Q₁ · Q₂| / r²',
-    'F = 9×10⁹ · (2×10⁻⁶ · 3×10⁻⁶) / (0,1)²',
-    'F = 9×10⁹ · 6×10⁻¹² / 0,01',
-    'F = 9×10⁹ · 6×10⁻¹⁰ = 5,4 N',
-    '✅ Síla F = 5,4 N (přitažlivá, náboje mají opačné znaménko)',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2:</strong> Kondenzátor (deskový) má vzdálenost desek d = 2 mm a napětí U = 100 V. Jaká je intenzita elektrického pole?',
-  [
-    'Zadáno: d = 2 mm = 0,002 m, U = 100 V',
-    'E = U / d = 100 / 0,002 = 50 000 V/m = 50 kV/m',
-    '✅ Intenzita pole E = 50 kV/m',
-  ]
-)}
+${renderExamples('elektrostatika')}
 <div class="tags"><span class="tag">coulomb [C]</span><span class="tag">siločáry</span><span class="tag">permitivita</span><span class="tag">ESD</span><span class="tag">potenciál</span></div>`
   },
 
@@ -926,26 +891,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Přímým vodičem prochází proud I = 5 A. Jaká je intenzita magnetického pole ve vzdálenosti r = 10 cm od vodiče?',
-  [
-    'Zadáno: I = 5 A, r = 0,1 m, µ₀ = 4π×10⁻⁷ ≈ 1,2566×10⁻⁶ T·m/A',
-    'B = µ₀ · I / (2π · r)',
-    'B = (1,2566×10⁻⁶ · 5) / (2π · 0,1)',
-    'B = 6,283×10⁻⁶ / 0,6283',
-    'B = 1×10⁻⁵ T = 10 µT',
-    '✅ B = 10 µT',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2 (kvalitativní):</strong> Vodičem teče proud směrem nahoru (↑). Urči směr magnetického pole ve dvou bodech — vlevo a vpravo od vodiče.',
-  [
-    'Uchop vodič pravou rukou, palec nahoru (↑ = směr proudu)',
-    'Vlevo od vodiče: prsty míří směrem od nás (⊗ — do stránky)',
-    'Vpravo od vodiče: prsty míří směrem k nám (⊙ — ze stránky)',
-    '✅ Vlevo: B jde do stránky ⊗ | Vpravo: B jde ze stránky ⊙',
-  ]
-)}
+${renderExamples('ampere')}
 <div class="tags"><span class="tag">pravá ruka</span><span class="tag">tesla [T]</span><span class="tag">solenoid</span><span class="tag">µ₀</span><span class="tag">Ampér</span></div>`
   },
 
@@ -1016,25 +962,7 @@ ${ex(
   </dl>
 
 <div class="section-label">Vzorové příklady</div>
-${ex(
-  '📝 <strong>Příklad 1:</strong> Vodič délky l = 0,2 m prochází kolmo magnetickým polem B = 0,5 T. Protéká jím proud I = 3 A. Jaká síla na vodič působí?',
-  [
-    'Zadáno: l = 0,2 m, B = 0,5 T, I = 3 A, α = 90° (sin 90° = 1)',
-    'F = B · I · l · sin(α)',
-    'F = 0,5 · 3 · 0,2 · 1 = 0,3 N',
-    '✅ Výsledek: F = 0,3 N  (směr určíme pravidlem levé ruky)',
-  ]
-)}
-${ex(
-  '📝 <strong>Příklad 2 (kvalitativní):</strong> Vodič se pohybuje dolů (↓) v magnetickém poli B mířícím doprava (→). Urči směr indukovaného proudu pravidlem pravé ruky.',
-  [
-    'Generátor → použijeme PRAVOU ruku',
-    'Prsty = směr pohybu vodiče = dolů (↓)',
-    'Dlaň čelí poli B = doprava (→)',
-    'Palec/ukazovák = směr proudu = ze stránky k nám (⊙)',
-    '✅ Indukovaný proud teče ze stránky směrem k nám ⊙',
-  ]
-)}
+${renderExamples('fleming')}
 <div class="tags"><span class="tag">levá ruka</span><span class="tag">pravá ruka</span><span class="tag">Lorentz</span><span class="tag">FBI</span><span class="tag">motor</span><span class="tag">generátor</span></div>`
   },
 
@@ -1269,6 +1197,22 @@ document.getElementById('expandAll').onclick = () => {
 document.getElementById('collapseAll').onclick = () => {
   cards.forEach(c => c.classList.remove('open'));
 };
+
+/* ---- Filtr obtížnosti ---- */
+document.querySelectorAll('.diff-chip').forEach(chip => {
+  chip.onclick = () => {
+    const d = chip.dataset.diff;
+    document.querySelectorAll('.diff-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    if (d === 'all') {
+      document.body.removeAttribute('data-diff');
+    } else {
+      document.body.setAttribute('data-diff', d);
+      // otevři všechny viditelné karty, ať jsou příklady vidět napříč tématy
+      cards.forEach(c => { if (c.style.display !== 'none') c.classList.add('open'); });
+    }
+  };
+});
 
 /* ---- Scroll nahoru ---- */
 const toTop = document.getElementById('toTop');

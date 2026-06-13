@@ -10,7 +10,8 @@ a vzorovými příklady, které mají skryté řešení.
 - 📚 Rozklikávací karty pro každé téma
 - 🔍 Fulltextové vyhledávání napříč všemi zápisky (se zvýrazněním)
 - ↕️ Rozbalit / sbalit vše
-- 🧮 Vzorové příklady s tlačítkem „Zobrazit řešení"
+- 🧮 Vzorové příklady ve třech úrovních obtížnosti (lehké / střední / těžké) s rozbalovacím postupem
+- 🎛️ Filtr příkladů podle obtížnosti napříč všemi tématy
 - 📱 Responzivní, funguje na mobilu i desktopu
 - ⚡ Žádný build, žádné závislosti — čisté HTML/CSS/JS
 
@@ -31,7 +32,8 @@ Alternativně můžeš celou složku jen přetáhnout do Netlify Drop: <https://
 
 ```
 .
-├── index.html      # celá aplikace (HTML + CSS + JS v jednom souboru)
-├── netlify.toml    # konfigurace nasazení
+├── index.html         # celá aplikace (HTML + CSS + JS)
+├── examples-data.js   # data vzorových příkladů (obtížnost, zadání, postup, výsledek)
+├── netlify.toml       # konfigurace nasazení
 └── README.md
 ```
