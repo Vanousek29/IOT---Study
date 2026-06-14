@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elektronika — Zápisky &amp; vzorové příklady</title>
-<meta name="description" content="Studijní zápisky z elektroniky a elektrotechniky pro Internet věcí: kondenzátory, cívky, Ohmův zákon, Kirchhoff, baterie, elektrostatika a víc — včetně vzorových příkladů s řešením.">
+<meta name="description" content="Studijní zápisky z elektrotechniky pro 1. ročník střední průmyslové školy: kondenzátory, cívky, magnetismus, Ohmův zákon, Kirchhoff, baterie, elektrostatika a víc — včetně vzorových příkladů s řešením.">
 <meta name="theme-color" content="#0f1117">
 <meta property="og:title" content="Elektronika — Zápisky &amp; vzorové příklady">
 <meta property="og:description" content="Interaktivní studijní materiál z elektrotechniky s vzorovými příklady a řešením.">
@@ -30,6 +30,7 @@
     --c7: #80deea;
     --c8: #ef9a9a;
     --c9: #9fa8da;
+    --c10: #b388ff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -162,6 +163,7 @@
   .t7 .legend dt { color: var(--c7); }
   .t8 .legend dt { color: var(--c8); }
   .t9 .legend dt { color: var(--c9); }
+  .t10 .legend dt { color: var(--c10); }
 
   /* Převodník jednotek */
   .converter {
@@ -370,6 +372,9 @@
   .t8 .formula { border-color: var(--c8); }
   .t9 .card-icon { background: rgba(159,168,218,0.12); }
   .t9 .formula { border-color: var(--c9); }
+  .t10 .card-icon { background: rgba(179,136,255,0.12); }
+  .t10 .formula { border-color: var(--c10); }
+  .t10 .example-toggle.shown, .t10 .example-result { color: var(--c10); }
 
   /* Filtr obtížnosti */
   .diff-filter {
@@ -433,7 +438,7 @@
 <body>
 
 <header>
-  <div class="label">Internet věcí — Elektrotechnika</div>
+  <div class="label">1. ročník SPŠ · Elektrotechnika</div>
   <h1>Zápisky & Vzorové příklady</h1>
   <p>Klikni na téma pro rozbalení · Příklady mají skryté řešení</p>
 </header>
@@ -588,21 +593,17 @@ ${renderExamples('kondenzator')}
 
   {
     id: "civky", icon: "🌀", theme: "t2", accentVar: "--c2",
-    title: "Cívky & Magnetismus", sub: "Induktivita, magnetické pole, Faraday",
+    title: "Cívky", sub: "Induktor, induktivita L, henry [H]",
     body: `
 <div class="section-label">Co to je</div>
-<p><strong style="color:var(--c2)">Cívka (induktor)</strong> je vinutý vodič — většinou měděný drát navinutý na jádro (vzduch, ferit, železo). Při průchodu proudu vytváří magnetické pole, a naopak: změna magnetického pole v cívce <em>indukuje</em> elektrické napětí (Faradayův zákon).</p>
-<p><strong>Magnetismus</strong> je projev pohybu elektrických nábojů. Každý magnet má dva póly: severní (N) a jižní (S). Stejné póly se odpuzují, různé přitahují. Magnetické pole si vizualizuj jako siločáry — vychází ze severu, vstupují na jihu.</p>
+<p><strong style="color:var(--c2)">Cívka (induktor)</strong> je vinutý vodič — většinou měděný drát navinutý na jádro (vzduch, ferit, železo). Při průchodu proudu vytváří kolem sebe magnetické pole a dokáže v něm krátkodobě uložit energii.</p>
+<p>Cívka „nemá ráda“ náhlé změny proudu: brání se jim tím, že v sobě <em>indukuje</em> napětí (vlastní indukce). Samotné magnetické pole, tok Φ a elektromagnetickou indukci najdeš v samostatném tématu <strong style="color:var(--c10)">Magnetismus</strong>.</p>
 
 <div class="section-label">Induktivita</div>
 <p><strong>Induktivita L</strong> vyjadřuje, jak dobře cívka "váže" magnetický tok. Závisí na počtu závitů, průřezu jádra a jeho materiálu. Jednotka je <strong>henry [H]</strong> — v praxi µH nebo mH.</p>
 <div class="formula"><span class="f-label">Indukované U:</span><span class="f-eq">U = −L · (ΔI / Δt)</span><span class="f-desc">Volt [V]</span></div>
 <div class="formula"><span class="f-label">Energie v poli:</span><span class="f-eq">E = ½ · L · I²</span><span class="f-desc">Jouly [J]</span></div>
 <div class="formula"><span class="f-label">Induktivita:</span><span class="f-eq">L = (µ₀ · µᵣ · N² · A) / l</span><span class="f-desc">henry [H]</span></div>
-
-<div class="section-label">Faradayův zákon elektromagnetické indukce</div>
-<p>Pokud se mění magnetický tok Φ procházející cívkou, indukuje se v ní napětí. Čím rychleji se tok mění a čím více závitů, tím větší napětí. Znaménko minus říká (Lenzův zákon), že indukované napětí působí <em>proti příčině</em>, která ho způsobila.</p>
-<div class="formula"><span class="f-label">Faraday:</span><span class="f-eq">U = −N · (ΔΦ / Δt)</span><span class="f-desc">N = počet závitů</span></div>
 
 <div class="section-label">Zapojení cívek</div>
 <ul>
@@ -637,7 +638,77 @@ ${renderExamples('kondenzator')}
 
 <div class="section-label">Vzorové příklady</div>
 ${renderExamples('civky')}
-<div class="tags"><span class="tag">henry [H]</span><span class="tag">indukce</span><span class="tag">Faraday</span><span class="tag">Lenz</span><span class="tag">transformátor</span></div>`
+<div class="tags"><span class="tag">henry [H]</span><span class="tag">vlastní indukce</span><span class="tag">reaktance X_L</span><span class="tag">transformátor</span></div>`
+  },
+
+  {
+    id: "magnetismus", icon: "🧲", theme: "t10", accentVar: "--c10",
+    title: "Magnetismus", sub: "Pole, tok Φ, tesla, indukce, Faraday, Lenz",
+    body: `
+<div class="section-label">Co je magnetismus</div>
+<p><strong style="color:var(--c10)">Magnetismus</strong> je vlastnost některých látek (železo, nikl, kobalt) a každého pohybujícího se elektrického náboje — vytvářet kolem sebe <em>magnetické pole</em>, kterým působí silou na jiné magnety a na vodiče s proudem.</p>
+<p>Každý magnet má dva <strong>póly</strong> — severní (N) a jižní (S). Póly nelze oddělit: když magnet rozlomíš, vzniknou zase dva menší magnety, každý s oběma póly. Platí jednoduché pravidlo: <em>souhlasné póly se odpuzují, nesouhlasné přitahují.</em></p>
+
+<div class="section-label">Magnetické pole a indukční čáry</div>
+<p>Prostor kolem magnetu nebo vodiče s proudem, kde působí magnetická síla, je <strong>magnetické pole</strong>. Znázorňujeme ho <strong>indukčními čarami (siločárami)</strong>: vně magnetu vystupují ze severního pólu a vstupují do jižního, uvnitř se uzavírají. Čím hustší čáry, tím silnější pole. <em>Homogenní</em> (rovnoměrné) pole má čáry rovnoběžné a stejně husté — třeba mezi póly podkovového magnetu.</p>
+<div class="tip">Střelka kompasu se natáčí v magnetickém poli Země. Její „severní“ konec míří k zeměpisnému severu — tam je tedy ve skutečnosti magnetický <em>jižní</em> pól Země.</div>
+
+<div class="section-label">Magnetická indukce B — tesla [T]</div>
+<p><strong>Magnetická indukce B</strong> je hlavní veličina, která říká, jak „silné“ je pole v daném místě a jakým směrem míří. Jednotkou je <strong>tesla [T]</strong>. Tesla je velká jednotka: pole Země je jen ~50 µT, magnet na lednici ~5 mT, magnet z reproduktoru ~1 T, přístroj MRI ~1,5–3 T.</p>
+<div class="formula"><span class="f-label">Síla na vodič:</span><span class="f-eq">F = B · I · l</span><span class="f-desc">odtud 1 T = 1 N/(A·m)</span></div>
+
+<div class="section-label">Magnetický (indukční) tok Φ — weber [Wb]</div>
+<p><strong>Magnetický tok Φ</strong> udává, kolik indukčních čar projde danou plochou. Závisí na indukci B, na obsahu plochy A a na úhlu α mezi polem a plochou. Jednotkou je <strong>weber [Wb]</strong>; platí 1 Wb = 1 T·m².</p>
+<div class="formula"><span class="f-label">Magnetický tok:</span><span class="f-eq">Φ = B · A · cos α</span><span class="f-desc">weber [Wb]</span></div>
+<p>Je-li plocha kolmá na pole (α = 0°), prochází jí maximum čar a tok je největší. Je-li plocha rovnoběžná s polem (α = 90°), neprojde žádná čára a tok je nulový.</p>
+
+<div class="section-label">Elektromagnetická indukce — Faradayův zákon</div>
+<p>Toto je nejdůležitější jev celé kapitoly: <strong>mění-li se magnetický tok procházející cívkou, indukuje se v ní napětí.</strong> Objevil ho Michael Faraday. Čím rychleji se tok mění a čím víc závitů cívka má, tím větší napětí vznikne. Na tomto principu fungují <em>všechny generátory, alternátory i transformátory.</em></p>
+<div class="formula"><span class="f-label">Faradayův zákon:</span><span class="f-eq">U = −N · (ΔΦ / Δt)</span><span class="f-desc">N = počet závitů</span></div>
+<p>Tok se dá měnit třemi způsoby: <strong>pohybem magnetu</strong> vůči cívce, <strong>změnou proudu</strong> v sousední cívce, nebo <strong>otáčením cívky</strong> v poli (to je princip generátoru).</p>
+
+<div class="section-label">Lenzův zákon — směr indukovaného proudu</div>
+<div class="rule-box">
+  <h3 style="color:var(--c10)">Lenzův zákon</h3>
+  <p>Indukovaný proud má vždy takový směr, aby svým magnetickým polem <strong>působil proti změně</strong>, která ho vyvolala. Proto je ve Faradayově vzorci znaménko minus. Je to projev zákona zachování energie — kdyby tomu tak nebylo, proud by sám sebe donekonečna zesiloval.</p>
+</div>
+
+<div class="section-label">Permeabilita — jak látka pole zesílí</div>
+<p><strong>Permeabilita</strong> popisuje, jak dobře látka „vede“ magnetické pole. Vakuum a vzduch mají permeabilitu µ₀ = 4π·10⁻⁷ T·m/A. <strong>Feromagnetické</strong> látky (železo, ferit) mají relativní permeabilitu µᵣ v řádu stovek až tisíců — proto se používají jako jádra cívek a elektromagnetů a pole mnohonásobně zesílí.</p>
+<ul>
+  <li><strong>Feromagnetické</strong> (Fe, Ni, Co) — silně se magnetují, µᵣ ≫ 1</li>
+  <li><strong>Paramagnetické</strong> (hliník) — velmi slabě přitahovány, µᵣ o málo > 1</li>
+  <li><strong>Diamagnetické</strong> (měď, voda) — velmi slabě odpuzovány, µᵣ o málo < 1</li>
+</ul>
+
+<div class="section-label">Kde se s tím potkáš</div>
+<ul>
+  <li><strong>Generátor / alternátor</strong> — otáčení cívky v poli → indukované napětí (výroba elektřiny)</li>
+  <li><strong>Transformátor</strong> — měnící se tok přenáší energii mezi dvěma cívkami</li>
+  <li><strong>Elektromotor</strong> — pole působí silou na vodič s proudem (viz Flemingovo pravidlo)</li>
+  <li><strong>Indukční vařič, bezdrátové nabíjení (Qi), RFID</strong> — přenos energie magnetickým polem</li>
+</ul>
+<div class="tip">Mnemotechnika: <strong>B</strong> je síla pole (tesla), <strong>Φ</strong> je „kolik pole“ projde plochou (weber). Napětí se indukuje jen tehdy, když se Φ <em>mění</em> — klidný magnet u cívky žádné napětí neudělá.</div>
+
+<div class="section-label">Význam veličin</div>
+<dl class="legend">
+    <dt>B</dt><dd><b>magnetická indukce</b> — tesla [T]</dd>
+    <dt>Φ</dt><dd><b>magnetický (indukční) tok</b> — weber [Wb]</dd>
+    <dt>A</dt><dd><b>obsah plochy</b> — [m²]</dd>
+    <dt>α</dt><dd><b>úhel mezi polem a plochou</b> — stupně [°]</dd>
+    <dt>U</dt><dd><b>indukované napětí</b> — volt [V]</dd>
+    <dt>N</dt><dd><b>počet závitů cívky</b> — bezrozměrné</dd>
+    <dt>ΔΦ / Δt</dt><dd><b>změna toku za čas</b> — [Wb/s]</dd>
+    <dt>F</dt><dd><b>síla na vodič s proudem</b> — newton [N]</dd>
+    <dt>I</dt><dd><b>proud</b> — ampér [A]</dd>
+    <dt>l</dt><dd><b>délka vodiče v poli</b> — [m]</dd>
+    <dt>µ₀</dt><dd><b>permeabilita vakua</b> — 4π·10⁻⁷ T·m/A</dd>
+    <dt>µᵣ</dt><dd><b>relativní permeabilita látky</b> — bezrozměrná</dd>
+  </dl>
+
+<div class="section-label">Vzorové příklady</div>
+${renderExamples('magnetismus')}
+<div class="tags"><span class="tag">tesla [T]</span><span class="tag">weber [Wb]</span><span class="tag">magnetický tok</span><span class="tag">Faraday</span><span class="tag">Lenz</span><span class="tag">permeabilita</span></div>`
   },
 
   {

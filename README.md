@@ -1,7 +1,7 @@
 # Elektronika — Zápisky & vzorové příklady
 
-Interaktivní jednostránkový studijní web z elektroniky a elektrotechniky (Internet věcí).
-Témata: kondenzátory, cívky & magnetismus, Ohmův zákon, Kirchhoffovy zákony, baterie,
+Interaktivní jednostránkový studijní web z elektrotechniky pro **1. ročník střední průmyslové školy**.
+Témata: kondenzátory, cívky, magnetismus, Ohmův zákon, Kirchhoffovy zákony, baterie,
 elektrostatika, Ampérovo pravidlo a Flemingovo pravidlo — každé s vysvětlením, vzorci
 a vzorovými příklady, které mají skryté řešení.
 
